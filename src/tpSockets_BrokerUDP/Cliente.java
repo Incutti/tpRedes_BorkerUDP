@@ -4,10 +4,24 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Cliente {
+    private String canal;
+
+    public Cliente(String canal) {
+        this.canal = canal;
+    }
+
+    public String getCanal() {
+        return canal;
+    }
+
+    public void setCanal(String canal) {
+        this.canal = canal;
+    }
 
     public static void main(String[] args) {
 
@@ -19,21 +33,23 @@ public class Cliente {
 
         try {
             //Obtengo la localizacion de localhost
-            InetAddress direccionServidor = InetAddress.getByName("172.16.255.168");
+            InetAddress direccionServidor = InetAddress.getByName("172.16.255.226");
 
             //Creo el socket de UDP
             DatagramSocket socketUDP = new DatagramSocket();
 
-            String mensaje = "¡dbgfdgf!";
+            String mensajeConCanal ="¡hola!#futbol";
+
+
 
             //Convierto el mensaje a bytes
-            buffer = mensaje.getBytes();
+            buffer = mensajeConCanal.getBytes();
 
             //Creo un datagrama
             DatagramPacket pregunta = new DatagramPacket(buffer, buffer.length, direccionServidor, PUERTO_SERVIDOR);
 
-            //Lo envio con send
-            System.out.println("Envio el datagrama");
+            //Lo envío con send
+            System.out.println("Envío el datagrama");
             socketUDP.send(pregunta);
 
             //Preparo la respuesta
@@ -41,7 +57,7 @@ public class Cliente {
 
             //Recibo la respuesta
             socketUDP.receive(peticion);
-            System.out.println("Recibo la peticion");
+            System.out.println("Recibo la confimación");
 
             //Cojo los datos y lo muestro
             String mensaje1 = new String(peticion.getData());
