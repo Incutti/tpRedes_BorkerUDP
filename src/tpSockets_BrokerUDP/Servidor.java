@@ -7,22 +7,27 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Servidor {
 
-    private HashMap<String /*nombreCanal*/, HashMap<Integer /*ip*/, Integer/*puerto*/>> canales;
+    private HashMap<String /*nombreCanal*/, HashSet<String /*ip:puerto*/>>canales;
 
-    public Servidor(HashMap<String, HashMap<Integer, Integer>> canales) {
+    public Servidor() {
+        canales= new HashMap<String,HashSet<String>>();
+    }
+
+    public Servidor(HashMap<String, HashSet<String>> canales) {
         this.canales = canales;
     }
 
-    public HashMap<String, HashMap<Integer, Integer>> getCanales() {
+    public HashMap<String, HashSet<String>> getCanales() {
         return canales;
     }
 
-    public void setCanales(HashMap<String, HashMap<Integer, Integer>> canales) {
+    public void setCanales(HashMap<String, HashSet<String>> canales) {
         this.canales = canales;
     }
 
@@ -32,6 +37,7 @@ public class Servidor {
         byte[] buffer = new byte[2048];
 
         try {
+            Servidor servidor = new Servidor();
             System.out.println("Iniciando el servidor UDP");
             //Creacion del socket
             DatagramSocket socketUDP = new DatagramSocket(PUERTO);
@@ -49,25 +55,22 @@ public class Servidor {
                 //Convierto lo recibido y mostrar el mensaje
                 String mensajeConCanal = new String(peticion.getData());
                 String mensaje="";
-                for(int i=0;i<mensajeConCanal.subSequence(0,mensajeConCanal.indexOf("#")).length();i++){
+                for(int i=0;i<mensajeConCanal.subSequence(0,mensajeConCanal.indexOf("#")-1).length();i++){
                     mensaje=mensaje+mensajeConCanal.charAt(i);
                 }
                 System.out.println(mensaje);
 
+
                 //Obtengo el puerto y la direccion de origen
+
                 //Si no se quiere responder, no es necesario
 
-                String canal="";
-                for(int i=0;i<mensajeConCanal.subSequence(mensajeConCanal.indexOf("#")+1,mensajeConCanal.length()-1).length();i++){
-                    canal=canal+mensajeConCanal.charAt(i);
-                }
-                if(canales){} // tengo q poner q agarre las direcciones y puertos de todos los q esten en el canal del msj.
                 int puertoCliente = peticion.getPort();
                 InetAddress direccion = peticion.getAddress();
 
                 byte[] buffer1 = new byte[2048];
-                String mensaje1 = "~acuse de recibo~";
-                buffer1 = mensaje1.getBytes();
+                String ack = "~acuse de recibo~";
+                buffer1 = ack.getBytes();
 
                 //creo el datagrama
                 DatagramPacket respuesta = new DatagramPacket(buffer1, buffer1.length, direccion, puertoCliente);
@@ -75,8 +78,35 @@ public class Servidor {
                 //Envio la información
                 System.out.println("~respondí esto~");
                 socketUDP.send(respuesta);
-                System.out.println(mensaje1);
+                System.out.println(ack);
                 System.out.println();
+
+                String canal="";
+                for(int i=0;i<mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"),mensajeConCanal.length()-1).length();i++) {
+                    canal = canal + mensajeConCanal.charAt(i);
+                }
+
+                System.out.println("~Se reenvió el mensaje a estas IPs: ~");
+                for(Map.Entry<String, HashSet<String>> canales : servidor.getCanales().entrySet()){
+                    if (canales.getKey().equals(canal)){
+                        for(String anna:canales.getValue()){
+                            //String ip= (String) anna.subSequence(0, anna.indexOf(":")-1);
+                            InetAddress ipSubscriptor = InetAddress.getByName((String) anna.subSequence(0, anna.indexOf(":")-1));
+                            String puertoaux = (String) anna.subSequence(anna.indexOf(":"),anna.length()-1);
+                            int puertoSubscriptor=Integer.parseInt(puertoaux);
+                            byte[] bufferBroker = new byte[2048];
+                            String mensajeReenviado = mensaje;
+                            buffer1 = mensajeReenviado.getBytes();
+
+                            //creo el datagrama
+                            DatagramPacket paqueteBroker = new DatagramPacket(buffer1, buffer1.length, ipSubscriptor, puertoSubscriptor);
+
+                            //Envio la información
+                            socketUDP.send(paqueteBroker);
+                            System.out.println(ipSubscriptor);
+                        }
+                    }
+                }
 
             }
 

@@ -1,3 +1,5 @@
+import tpSockets_BrokerUDP.ThreadCliente;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -33,11 +35,10 @@ public class Cliente {
 
         try {
             //Obtengo la localizacion de localhost
-            InetAddress direccionServidor = InetAddress.getByName("172.16.255.226");
+            InetAddress direccionServidor = InetAddress.getByName("127.0.0.1");
 
             //Creo el socket de UDP
             DatagramSocket socketUDP = new DatagramSocket();
-
             String mensajeConCanal ="¡hola!#futbol";
 
 
