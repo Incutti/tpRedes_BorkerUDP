@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +30,7 @@ public class Cliente {
 
     public static void main(String[] args) {
 
+        Scanner scanner = new Scanner(System.in);
         //puerto del servidor
         final int PUERTO_SERVIDOR = 5000;
         //buffer donde se almacenara los mensajes
@@ -41,7 +43,8 @@ public class Cliente {
 
             //Creo el socket de UDP
             DatagramSocket socketUDP = new DatagramSocket();
-            String mensajeConCanal ="¡hola!#futbol";
+            String mensajeConCanal /*="¡hola!#futbol"*/;
+            mensajeConCanal= scanner.next();
 
 
 

@@ -35,7 +35,7 @@ public class Servidor {
 
         Servidor servidor = new Servidor();
         HashSet<String> ipPuerto = new HashSet<>();
-        ipPuerto.add("172.16.255.226:5000");
+        ipPuerto.add("172.16.255.204:5000");
         servidor.getCanales().put("futbol", ipPuerto);
 
 
@@ -62,7 +62,7 @@ public class Servidor {
                 //Convierto lo recibido y mostrar el mensaje
                 String mensajeConCanal = new String(peticion.getData());
                 String mensaje="";
-                for(int i=0;i<mensajeConCanal.subSequence(0,mensajeConCanal.indexOf("#")-1).length();i++){
+                for(int i=0;i<mensajeConCanal.subSequence(0,mensajeConCanal.indexOf("#")).length();i++){
                     mensaje=mensaje+mensajeConCanal.charAt(i);
                 }
                 System.out.println(mensaje);
@@ -98,7 +98,7 @@ public class Servidor {
                     if (canales.getKey().equals(canal)){
                         for(String anna:canales.getValue()){
                             //String ip= (String) anna.subSequence(0, anna.indexOf(":")-1);
-                            InetAddress ipSubscriptor = InetAddress.getByName((String) anna.subSequence(0, anna.indexOf(":")-1));
+                            InetAddress ipSubscriptor = InetAddress.getByName((String) anna.subSequence(0, anna.indexOf(":")));
                             String puertoaux = (String) anna.subSequence(anna.indexOf(":"),anna.length()-1);
                             int puertoSubscriptor=Integer.parseInt(puertoaux);
                             byte[] bufferBroker = new byte[2048];
