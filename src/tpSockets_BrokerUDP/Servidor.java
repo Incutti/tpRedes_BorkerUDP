@@ -33,11 +33,18 @@ public class Servidor {
 
     public static void main(String[] args) {
 
+        Servidor servidor = new Servidor();
+        HashSet<String> ipPuerto = new HashSet<>();
+        ipPuerto.add("172.16.255.226:5000");
+        servidor.getCanales().put("futbol", ipPuerto);
+
+
+
         final int PUERTO = 5000;
         byte[] buffer = new byte[2048];
 
         try {
-            Servidor servidor = new Servidor();
+
             System.out.println("Iniciando el servidor UDP");
             //Creacion del socket
             DatagramSocket socketUDP = new DatagramSocket(PUERTO);
