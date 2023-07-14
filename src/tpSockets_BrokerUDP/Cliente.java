@@ -36,50 +36,51 @@ public class Cliente {
         //buffer donde se almacenara los mensajes
         byte[] buffer = new byte[2048];
         byte[] buffer1 = new byte[2048];
+        while(true) {
+            try {
+                //Obtengo la localizacion de localhost
+                InetAddress direccionServidor = InetAddress.getByName("172.16.255.226");
 
-        try {
-            //Obtengo la localizacion de localhost
-            InetAddress direccionServidor = InetAddress.getByName("127.0.0.1");
+                //Creo el socket de UDP
+                DatagramSocket socketUDP = new DatagramSocket();
+                String mensajeConCanal /*="¡hola!#futbol"*/;
+                mensajeConCanal = scanner.next();
 
-            //Creo el socket de UDP
-            DatagramSocket socketUDP = new DatagramSocket();
-            String mensajeConCanal /*="¡hola!#futbol"*/;
-            mensajeConCanal= scanner.next();
+                if(mensajeConCanal.contains("#")) {
+                    //Convierto el mensaje a bytes
+                    buffer = mensajeConCanal.getBytes();
 
+                    //Creo un datagrama
+                    DatagramPacket pregunta = new DatagramPacket(buffer, buffer.length, direccionServidor, PUERTO_SERVIDOR);
 
+                    //Lo envío con send
+                    System.out.println("Envío el datagrama");
+                    socketUDP.send(pregunta);
 
-            //Convierto el mensaje a bytes
-            buffer = mensajeConCanal.getBytes();
+                    //Preparo la respuesta
+                    DatagramPacket peticion = new DatagramPacket(buffer1, buffer1.length);
 
-            //Creo un datagrama
-            DatagramPacket pregunta = new DatagramPacket(buffer, buffer.length, direccionServidor, PUERTO_SERVIDOR);
+                    //Recibo la respuesta
+                    socketUDP.receive(peticion);
+                    System.out.println("Recibo la confimación");
 
-            //Lo envío con send
-            System.out.println("Envío el datagrama");
-            socketUDP.send(pregunta);
+                    //Cojo los datos y lo muestro
+                    String mensaje1 = new String(peticion.getData());
+                    System.out.println(mensaje1);
 
-            //Preparo la respuesta
-            DatagramPacket peticion = new DatagramPacket(buffer1, buffer1.length);
-
-            //Recibo la respuesta
-            socketUDP.receive(peticion);
-            System.out.println("Recibo la confimación");
-
-            //Cojo los datos y lo muestro
-            String mensaje1 = new String(peticion.getData());
-            System.out.println(mensaje1);
-
-            //cierro el socket
-            socketUDP.close();
-
-        } catch (SocketException ex) {
-            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+                    //cierro el socket
+                    socketUDP.close();
+                } else {
+                    System.out.println("Ingrese un mensaje con el formato correcto. El mismo sería: mensaje#tópico");
+                }
+            } catch (SocketException ex) {
+                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-
     }
 
 }
