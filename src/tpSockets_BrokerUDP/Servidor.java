@@ -57,64 +57,77 @@ public class Servidor {
 
                 //Recibo el datagrama
                 socketUDP.receive(peticion);
+
+
                 System.out.println("~me llega lo siguiente~");
 
                 //Convierto lo recibido y mostrar el mensaje
                 String mensajeConCanal = new String(peticion.getData());
-                String mensaje="";
-                for(int i=0;i<mensajeConCanal.subSequence(0,mensajeConCanal.indexOf("#")).length();i++){
-                    mensaje=mensaje+mensajeConCanal.charAt(i);
+
+
+                if(mensajeConCanal.contains("SubsTop#")){
+                    String topico="";
+                    String ipMasPuerto="";
+                    for (int i = mensajeConCanal.indexOf("#"); i < mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"), mensajeConCanal.length()-1).length(); i++) {
+                        topico = topico + mensajeConCanal.charAt(i);
+                    }
+                    System.out.println("SubsTop#" + topico);
+                    servidor.getCanales().values // hay q cargar el hashset d string ip:puerto
+                    servidor.getCanales().put(topico, ); // hay q cargar el hashset al topico en cuestion
+
                 }
-                System.out.println(mensaje);
+                else {
+                    String mensaje="";
+                    for (int i = 0; i < mensajeConCanal.subSequence(0, mensajeConCanal.indexOf("#")).length(); i++) {
+                        mensaje = mensaje + mensajeConCanal.charAt(i);
+                    }
+                    System.out.println(mensaje);
+                    //Obtengo el puerto y la direccion de origen
+                    //Si no se quiere responder, no es necesario
 
+                    int puertoCliente = peticion.getPort();
+                    InetAddress direccion = peticion.getAddress();
 
-                //Obtengo el puerto y la direccion de origen
+                    byte[] buffer1 = new byte[2048];
+                    String ack = "ACK";
+                    buffer1 = ack.getBytes();
 
-                //Si no se quiere responder, no es necesario
+                    //creo el datagrama
+                    DatagramPacket respuesta = new DatagramPacket(buffer1, buffer1.length, direccion, puertoCliente);
 
-                int puertoCliente = peticion.getPort();
-                InetAddress direccion = peticion.getAddress();
+                    //Envio la información
+                    System.out.println("~respondí esto~");
+                    socketUDP.send(respuesta);
+                    System.out.println(ack);
+                    System.out.println();
 
-                byte[] buffer1 = new byte[2048];
-                String ack = "~acuse de recibo~";
-                buffer1 = ack.getBytes();
+                    String canal = "";
+                    for (int i = 0; i < mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"), mensajeConCanal.length() - 1).length(); i++) {
+                        canal = canal + mensajeConCanal.charAt(i);
+                    }
 
-                //creo el datagrama
-                DatagramPacket respuesta = new DatagramPacket(buffer1, buffer1.length, direccion, puertoCliente);
+                    System.out.println("~Se reenvió el mensaje a estas IPs: ~");
+                    for (Map.Entry<String, HashSet<String>> canales : servidor.getCanales().entrySet()) {
+                        if (canales.getKey().equals(canal)) {
+                            for (String anna : canales.getValue()) {
+                                //String ip= (String) anna.subSequence(0, anna.indexOf(":")-1);
+                                InetAddress ipSubscriptor = InetAddress.getByName((String) anna.subSequence(0, anna.indexOf(":")));
+                                String puertoaux = (String) anna.subSequence(anna.indexOf(":"), anna.length() - 1);
+                                int puertoSubscriptor = Integer.parseInt(puertoaux);
+                                byte[] bufferBroker = new byte[2048];
+                                String mensajeReenviado = mensaje;
+                                buffer1 = mensajeReenviado.getBytes();
 
-                //Envio la información
-                System.out.println("~respondí esto~");
-                socketUDP.send(respuesta);
-                System.out.println(ack);
-                System.out.println();
+                                //creo el datagrama
+                                DatagramPacket paqueteBroker = new DatagramPacket(buffer1, buffer1.length, ipSubscriptor, puertoSubscriptor);
 
-                String canal="";
-                for(int i=0;i<mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"),mensajeConCanal.length()-1).length();i++) {
-                    canal = canal + mensajeConCanal.charAt(i);
-                }
-
-                System.out.println("~Se reenvió el mensaje a estas IPs: ~");
-                for(Map.Entry<String, HashSet<String>> canales : servidor.getCanales().entrySet()){
-                    if (canales.getKey().equals(canal)){
-                        for(String anna:canales.getValue()){
-                            //String ip= (String) anna.subSequence(0, anna.indexOf(":")-1);
-                            InetAddress ipSubscriptor = InetAddress.getByName((String) anna.subSequence(0, anna.indexOf(":")));
-                            String puertoaux = (String) anna.subSequence(anna.indexOf(":"),anna.length()-1);
-                            int puertoSubscriptor=Integer.parseInt(puertoaux);
-                            byte[] bufferBroker = new byte[2048];
-                            String mensajeReenviado = mensaje;
-                            buffer1 = mensajeReenviado.getBytes();
-
-                            //creo el datagrama
-                            DatagramPacket paqueteBroker = new DatagramPacket(buffer1, buffer1.length, ipSubscriptor, puertoSubscriptor);
-
-                            //Envio la información
-                            socketUDP.send(paqueteBroker);
-                            System.out.println(ipSubscriptor);
+                                //Envio la información
+                                socketUDP.send(paqueteBroker);
+                                System.out.println(ipSubscriptor);
+                            }
                         }
                     }
                 }
-
             }
 
         } catch (SocketException ex) {

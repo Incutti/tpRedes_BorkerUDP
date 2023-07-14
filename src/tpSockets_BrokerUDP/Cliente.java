@@ -44,7 +44,7 @@ public class Cliente {
                 //Creo el socket de UDP
                 DatagramSocket socketUDP = new DatagramSocket();
                 String mensajeConCanal /*="¡hola!#futbol"*/;
-                mensajeConCanal = scanner.next();
+                mensajeConCanal = scanner.nextLine();
 
                 if(mensajeConCanal.contains("#")) {
                     //Convierto el mensaje a bytes
