@@ -39,7 +39,7 @@ public class Cliente {
         while(true) {
             try {
                 //Obtengo la localizacion de localhost
-                InetAddress direccionServidor = InetAddress.getByName("172.16.255.226");
+                InetAddress direccionServidor = InetAddress.getByName("127.0.0.1");
 
                 //Creo el socket de UDP
                 DatagramSocket socketUDP = new DatagramSocket();

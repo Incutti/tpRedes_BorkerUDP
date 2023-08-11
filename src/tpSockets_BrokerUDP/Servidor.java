@@ -68,13 +68,17 @@ public class Servidor {
                 if(mensajeConCanal.contains("SubsTop#")){
                     String topico="";
                     String ipMasPuerto="";
-                    for (int i = mensajeConCanal.indexOf("#"); i < mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"), mensajeConCanal.length()-1).length(); i++) {
-                        topico = topico + mensajeConCanal.charAt(i);
-                    }
+                    topico=mensajeConCanal.split("#")[1];
+//                    for (int i = mensajeConCanal.indexOf("#"); i < mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"), mensajeConCanal.length()-1).length(); i++) {
+//                        topico = topico + mensajeConCanal.charAt(i);
+//                    }
                     System.out.println("SubsTop#" + topico);
-                    servidor.getCanales().values // hay q cargar el hashset d string ip:puerto
-                    servidor.getCanales().put(topico, ); // hay q cargar el hashset al topico en cuestion
 
+                    //servidor.getCanales(). // hay q cargar el hashset d string ip:puerto
+                    //servidor.getCanales().put(topico,ipPuerto ); // hay q cargar el hashset al topico en cuestion
+                    HashSet<String> usuarios = servidor.getCanales().remove(topico);
+                    usuarios.add(ipMasPuerto);
+                    servidor.getCanales().put(topico, usuarios);
                 }
                 else {
                     String mensaje="";
