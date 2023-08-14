@@ -8,6 +8,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -34,8 +35,8 @@ public class Cliente {
         //puerto del servidor
         final int PUERTO_SERVIDOR = 5000;
         //buffer donde se almacenara los mensajes
-        byte[] buffer = new byte[2048];
-        byte[] buffer1 = new byte[2048];
+        byte[] buffer = new byte[256];
+        byte[] buffer1 = new byte[256];
         while(true) {
             try {
                 //Obtengo la localizacion de localhost
@@ -48,7 +49,8 @@ public class Cliente {
 
                 if(mensajeConCanal.contains("#")) {
                     //Convierto el mensaje a bytes
-                    buffer = mensajeConCanal.getBytes();
+                    buffer = mensajeConCanal.getBytes(StandardCharsets.UTF_8);
+
 
                     //Creo un datagrama
                     DatagramPacket pregunta = new DatagramPacket(buffer, buffer.length, direccionServidor, PUERTO_SERVIDOR);

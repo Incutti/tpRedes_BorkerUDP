@@ -14,7 +14,7 @@ public class ThreadCliente extends Thread{
 
     @Override
     public void run(){
-        byte[] buffer = new byte[2048];
+        byte[] buffer = new byte[256];
         try{
             while(true){
                 //Preparo un posible mensaje a recibir
@@ -34,3 +34,4 @@ public class ThreadCliente extends Thread{
         }
     }
 }
+

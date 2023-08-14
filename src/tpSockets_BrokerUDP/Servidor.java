@@ -41,7 +41,7 @@ public class Servidor {
 
 
         final int PUERTO = 5000;
-        byte[] buffer = new byte[2048];
+        byte[] buffer = new byte[256];
 
         try {
 
@@ -69,16 +69,14 @@ public class Servidor {
                     String topico="";
                     String ipMasPuerto="";
                     topico=mensajeConCanal.split("#")[1];
+                    topico=topico.split("/")[0];
 //                    for (int i = mensajeConCanal.indexOf("#"); i < mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"), mensajeConCanal.length()-1).length(); i++) {
 //                        topico = topico + mensajeConCanal.charAt(i);
 //                    }
                     System.out.println("SubsTop#" + topico);
-
-                    //servidor.getCanales(). // hay q cargar el hashset d string ip:puerto
-                    //servidor.getCanales().put(topico,ipPuerto ); // hay q cargar el hashset al topico en cuestion
-                    HashSet<String> usuarios = servidor.getCanales().remove(topico);
-                    usuarios.add(ipMasPuerto);
-                    servidor.getCanales().put(topico, usuarios);
+                    ipMasPuerto = peticion.getAddress().toString() + ":" + peticion.getPort();
+                    ipMasPuerto=ipMasPuerto.substring(1, ipMasPuerto.length()-1);
+                    servidor.getCanales().get(topico).add(ipMasPuerto);
                 }
                 else {
                     String mensaje="";
@@ -92,7 +90,7 @@ public class Servidor {
                     int puertoCliente = peticion.getPort();
                     InetAddress direccion = peticion.getAddress();
 
-                    byte[] buffer1 = new byte[2048];
+                    byte[] buffer1 = new byte[256];
                     String ack = "ACK";
                     buffer1 = ack.getBytes();
 
@@ -118,7 +116,7 @@ public class Servidor {
                                 InetAddress ipSubscriptor = InetAddress.getByName((String) anna.subSequence(0, anna.indexOf(":")));
                                 String puertoaux = (String) anna.subSequence(anna.indexOf(":"), anna.length() - 1);
                                 int puertoSubscriptor = Integer.parseInt(puertoaux);
-                                byte[] bufferBroker = new byte[2048];
+                                byte[] bufferBroker = new byte[256];
                                 String mensajeReenviado = mensaje;
                                 buffer1 = mensajeReenviado.getBytes();
 
