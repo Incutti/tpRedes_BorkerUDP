@@ -34,10 +34,10 @@ public class Servidor {
     public static void main(String[] args) {
 
         Servidor servidor = new Servidor();
-        HashSet<String> ipPuerto = new HashSet<>();
-        ipPuerto.add("172.16.255.204:5000");
-        servidor.getCanales().put("futbol", ipPuerto);
-
+        //HashSet<String> ipPuerto = new HashSet<>();
+        //ipPuerto.add("127.0.0.1:5565");
+        //servidor.getCanales().put("futbol", ipPuerto);
+        // eso es solo para llenar con algo
 
 
         final int PUERTO = 5000;
@@ -76,7 +76,23 @@ public class Servidor {
                     System.out.println("SubsTop#" + topico);
                     ipMasPuerto = peticion.getAddress().toString() + ":" + peticion.getPort();
                     ipMasPuerto=ipMasPuerto.substring(1, ipMasPuerto.length()-1);
-                    servidor.getCanales().get(topico).add(ipMasPuerto);
+                    //System.out.println(ipMasPuerto);
+                    if(servidor.getCanales().containsKey(topico)) {
+                        servidor.getCanales().get(topico).add(ipMasPuerto);
+                    } else{
+                        HashSet<String>auxiliar=new HashSet<>();
+                        auxiliar.add(ipMasPuerto);
+                        servidor.getCanales().put(topico,auxiliar);
+                    }
+                    /*for(Map.Entry<String, HashSet<String>> canales : servidor.getCanales().entrySet()){
+                        if(canales.getKey().equals(topico)){
+                            for (String suscrpitor: canales.getValue()) {
+                                System.out.println(suscrpitor);
+                            }
+                        }
+
+                    }*/ // para probar que suscriba bien
+
                 }
                 else {
                     String mensaje="";
