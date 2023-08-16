@@ -40,8 +40,8 @@ public class Servidor {
         // eso es solo para llenar con algo
 
 
-        final int PUERTO = 5000;
-        byte[] buffer = new byte[256];
+        final int PUERTO = 5001;
+        //  byte[] buffer = new byte[256];
 
         try {
 
@@ -51,7 +51,7 @@ public class Servidor {
 
             //Siempre atendera peticiones
             while (true) {
-
+                byte[] buffer = new byte[256];
                 //Preparo la respuesta
                 DatagramPacket peticion = new DatagramPacket(buffer, buffer.length);
 
@@ -92,10 +92,26 @@ public class Servidor {
                         }
 
                     }*/ // para probar que suscriba bien
+                    int puertoCliente = peticion.getPort();
+                    InetAddress direccion = peticion.getAddress();
+
+                    byte[] buffer1 = new byte[256];
+                    String ack = "ACK";
+                    buffer1 = ack.getBytes();
+
+                    //creo el datagrama
+                    DatagramPacket respuesta = new DatagramPacket(buffer1, buffer1.length, direccion, puertoCliente);
+
+                    //Envio la información
+                    System.out.println("~respondí esto~");
+                    socketUDP.send(respuesta);
+                    System.out.println(ack);
+                    System.out.println();
 
                 }
                 else {
                     String mensaje="";
+
                     for (int i = 0; i < mensajeConCanal.subSequence(0, mensajeConCanal.indexOf("#")).length(); i++) {
                         mensaje = mensaje + mensajeConCanal.charAt(i);
                     }
@@ -120,17 +136,21 @@ public class Servidor {
                     System.out.println();
 
                     String canal = "";
-                    for (int i = 0; i < mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"), mensajeConCanal.length() - 1).length(); i++) {
-                        canal = canal + mensajeConCanal.charAt(i);
-                    }
+                    //                  for (int i = 0; i < mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"), mensajeConCanal.length() - 1).length(); i++) {
+                    //                    canal = canal + mensajeConCanal.charAt(i);
+                    //              }
+                    canal=mensajeConCanal.split("#")[1];
+                    canal=canal.split("/")[0];
 
                     System.out.println("~Se reenvió el mensaje a estas IPs: ~");
                     for (Map.Entry<String, HashSet<String>> canales : servidor.getCanales().entrySet()) {
                         if (canales.getKey().equals(canal)) {
                             for (String anna : canales.getValue()) {
                                 //String ip= (String) anna.subSequence(0, anna.indexOf(":")-1);
-                                InetAddress ipSubscriptor = InetAddress.getByName((String) anna.subSequence(0, anna.indexOf(":")));
-                                String puertoaux = (String) anna.subSequence(anna.indexOf(":"), anna.length() - 1);
+//                                InetAddress ipSubscriptor = InetAddress.getByName((String) anna.subSequence(0, anna.indexOf(":")));
+                                InetAddress ipSubscriptor = InetAddress.getByName((String) anna.split(":")[0]);
+//                                String puertoaux = (String) anna.subSequence(anna.indexOf(":"), anna.length() - 1);
+                                String puertoaux=anna.split(":")[1];
                                 int puertoSubscriptor = Integer.parseInt(puertoaux);
                                 byte[] bufferBroker = new byte[256];
                                 String mensajeReenviado = mensaje;
@@ -143,6 +163,7 @@ public class Servidor {
                                 socketUDP.send(paqueteBroker);
                                 System.out.println(ipSubscriptor);
                             }
+
                         }
                     }
                 }

@@ -16,6 +16,8 @@ import java.util.logging.Logger;
 
 public class Cliente {
     private String canal;
+    private HashSet<String> topicoSubscriptos;
+    private DatagramSocket socket;
 
     public Cliente(String canal) {
         this.canal = canal;
@@ -33,20 +35,32 @@ public class Cliente {
 
         Scanner scanner = new Scanner(System.in);
         //puerto del servidor
-        final int PUERTO_SERVIDOR = 5000;
+        final int PUERTO_SERVIDOR = 5001;
         //buffer donde se almacenara los mensajes
         byte[] buffer = new byte[256];
         byte[] buffer1 = new byte[256];
+        byte[] buffer2 = new byte[256];
+
+
         while(true) {
             try {
+                //DatagramPacket paquete =new DatagramPacket(buffer,buffer.length);
+                //socket.receive(paquete);
+                //ayudin de juan
+                HashSet<String> topicoSubscriptos=new HashSet<>();
                 //Obtengo la localizacion de localhost
                 InetAddress direccionServidor = InetAddress.getByName("127.0.0.1");
 
                 //Creo el socket de UDP
                 DatagramSocket socketUDP = new DatagramSocket();
-                String mensajeConCanal /*="¡hola!#futbol"*/;
+                String mensajeConCanal /*="¡hola!#futbol/"*/;
                 mensajeConCanal = scanner.nextLine();
-
+                String topico="";
+                topico=mensajeConCanal.split("#")[1];
+                topico=topico.split("/")[0];
+                if(mensajeConCanal.contains("SubsTop#")){
+                    topicoSubscriptos.add(topico);
+                }
                 if(mensajeConCanal.contains("#")) {
                     //Convierto el mensaje a bytes
                     buffer = mensajeConCanal.getBytes(StandardCharsets.UTF_8);
@@ -69,6 +83,19 @@ public class Cliente {
                     //Cojo los datos y lo muestro
                     String mensaje1 = new String(peticion.getData());
                     System.out.println(mensaje1);
+
+
+                    if(!(mensajeConCanal.contains("SubsTop#"))){
+                        for (String topiquito: topicoSubscriptos){
+                            if (topiquito.equals(topico)) {
+                                DatagramPacket mensajeTopico = new DatagramPacket(buffer2, buffer2.length);
+                                socketUDP.receive(mensajeTopico);
+                                // muestro Mensaje Recibido
+                                String mensaje2 = new String(mensajeTopico.getData());
+                                System.out.println(mensaje2);
+                            }
+                        }
+                    }
 
                     //cierro el socket
                     socketUDP.close();
