@@ -42,7 +42,10 @@ public class Cliente {
         DatagramSocket socketUDP = new DatagramSocket();
         while(true) {
             try {
-
+                Thread hiloAck = new Thread(new ThreadCLiente(socketUDP));
+                Thread hiloEscucha1 = new Thread(new ThreadCLiente(socketUDP));
+                hiloAck.start();
+                hiloEscucha1.start();
                 //Obtengo la localizacion de localhost
                 InetAddress direccionServidor = InetAddress.getByName("127.0.0.1");
 
@@ -55,13 +58,14 @@ public class Cliente {
 
                 String mensajeConCanal /*="¡hola!#futbol/"*/;
                 mensajeConCanal = scanner.nextLine();
-                String topico="";
-                topico=mensajeConCanal.split("#")[1];
-                topico=topico.split("/")[0];
-                if(mensajeConCanal.contains("SubsTop#")){
-                    topicoSubscriptos.add(topico);
-                }
                 if(mensajeConCanal.contains("#")) {
+                    String topico="";
+                    topico=mensajeConCanal.split("#")[1];
+                    topico=topico.split("/")[0];
+                    if(mensajeConCanal.contains("SubsTop#")){
+                        topicoSubscriptos.add(topico);
+                    }
+
                     //Convierto el mensaje a bytes
                     buffer = mensajeConCanal.getBytes(StandardCharsets.UTF_8);
 
@@ -80,9 +84,6 @@ public class Cliente {
                   // socketUDP.receive(peticion);
                    System.out.println("Recibo la confimación");
 
-                   Thread hiloAck = new Thread(new ThreadCLiente(socketUDP));
-                    Thread hiloEscucha1 = new Thread(new ThreadCLiente(socketUDP));
-                   hiloAck.start();
 
 
 
@@ -94,7 +95,7 @@ public class Cliente {
                     if(!(mensajeConCanal.contains("SubsTop#"))){
                         for (String topiquito: topicoSubscriptos){
                             if (topiquito.equals(topico)) {
-                                hiloEscucha1.start();
+
                                // DatagramPacket mensajeTopico = new DatagramPacket(buffer2, buffer2.length);
                              //   socketUDP.receive(mensajeTopico);
                                 // muestro Mensaje Recibido
@@ -108,7 +109,7 @@ public class Cliente {
                     //cierro el socke
                     // socketUDP.close();
                 } else {
-                    System.out.println("Ingrese un mensaje con el formato correcto. El mismo sería: mensaje#tópico");
+                    System.out.println("Ingrese un mensaje con el formato correcto. El mismo sería: mensaje#tópico/");
                 }
             } catch (SocketException ex) {
                 Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);

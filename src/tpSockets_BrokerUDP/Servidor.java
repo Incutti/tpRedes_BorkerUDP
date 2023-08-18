@@ -74,7 +74,7 @@ public class Servidor {
                     ipMasPuerto = peticion.getAddress().toString() + ":" + peticion.getPort();
                     ipMasPuerto=ipMasPuerto.substring(1, ipMasPuerto.length());
                     if(servidor.getCanales().containsKey(topico)) {
-                        servidor.getCanales().get(topico).add(ipMasPuerto);
+                        servidor.getCanales().get(topico).add("/"+ipMasPuerto);
                     } else{
                         HashSet<String>auxiliar=new HashSet<>();
                         auxiliar.add("/" + ipMasPuerto);
@@ -135,8 +135,8 @@ public class Servidor {
                     System.out.println("~Se reenvió el mensaje a estas IPs: ~");
                     for (Map.Entry<String, HashSet<String>> canales : servidor.getCanales().entrySet()) {
                         if (canales.getKey().equals(canal)) {
-                            for (String anna : canales.getValue()) {
-                                for(Map.Entry<InetAddress, Integer> clients : clientes.entrySet()){
+                            for(Map.Entry<InetAddress, Integer> clients : clientes.entrySet()){
+                                for (String anna : canales.getValue()) {
                                     if(clients.getKey().toString().equals(anna.split(":")[0])){
 
                                         String mensajeReenviado = mensaje;
