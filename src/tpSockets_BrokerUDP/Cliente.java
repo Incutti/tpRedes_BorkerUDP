@@ -1,6 +1,6 @@
 package tpSockets_BrokerUDP;
 
-import tpSockets_BrokerUDP.ThreadCliente;
+import tpSockets_BrokerUDP.ThreadCLiente;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -53,7 +53,7 @@ public class Cliente {
 //                ThreadCliente hiloEscucha = new ThreadCliente(socketUDP);
 //                hiloEscucha.start();
 
-                String mensajeConCanal /*="¡hola!#futbol"*/;
+                String mensajeConCanal /*="¡hola!#futbol/"*/;
                 mensajeConCanal = scanner.nextLine();
                 String topico="";
                 topico=mensajeConCanal.split("#")[1];
@@ -74,25 +74,32 @@ public class Cliente {
                     socketUDP.send(pregunta);
 
                     //Preparo la respuesta
-                    DatagramPacket peticion = new DatagramPacket(buffer1, buffer1.length);
+                    //DatagramPacket peticion = new DatagramPacket(buffer1, buffer1.length);
 
-                    //Recibo la respuesta
-                    socketUDP.receive(peticion);
-                    System.out.println("Recibo la confimación");
+                   //Recibo la respuesta
+                  // socketUDP.receive(peticion);
+                   System.out.println("Recibo la confimación");
+
+                   Thread hiloAck = new Thread(new ThreadCLiente(socketUDP));
+                    Thread hiloEscucha1 = new Thread(new ThreadCLiente(socketUDP));
+                   hiloAck.start();
+
+
 
                     //Cojo los datos y lo muestro
-                    String mensaje1 = new String(peticion.getData());
-                    System.out.println(mensaje1);
+                    //String mensaje1 = new String(peticion.getData());
+                    //System.out.println(mensaje1);
 
 
                     if(!(mensajeConCanal.contains("SubsTop#"))){
                         for (String topiquito: topicoSubscriptos){
                             if (topiquito.equals(topico)) {
-                                DatagramPacket mensajeTopico = new DatagramPacket(buffer2, buffer2.length);
-                                socketUDP.receive(mensajeTopico);
+                                hiloEscucha1.start();
+                               // DatagramPacket mensajeTopico = new DatagramPacket(buffer2, buffer2.length);
+                             //   socketUDP.receive(mensajeTopico);
                                 // muestro Mensaje Recibido
-                                String mensaje2 = new String(mensajeTopico.getData());
-                                System.out.println(mensaje2);
+                             //   String mensaje2 = new String(mensajeTopico.getData());
+                             //   System.out.println(mensaje2);
                             }
                         }
 
