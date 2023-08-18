@@ -15,19 +15,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Cliente {
-    private String canal;
-
-    public Cliente(String canal) {
-        this.canal = canal;
-    }
-
-    public String getCanal() {
-        return canal;
-    }
-
-    public void setCanal(String canal) {
-        this.canal = canal;
-    }
+//    private String canal;
+//
+//    public Cliente(String canal) {
+//        this.canal = canal;
+//    }
+//
+//    public String getCanal() {
+//        return canal;
+//    }
+//
+//    public void setCanal(String canal) {
+//        this.canal = canal;
+//    }
 
     public static void main(String[] args) {
 
