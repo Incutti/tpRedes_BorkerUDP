@@ -29,7 +29,7 @@ public class Cliente {
 //        this.canal = canal;
 //    }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SocketException {
 
         Scanner scanner = new Scanner(System.in);
         //puerto del servidor
@@ -39,6 +39,7 @@ public class Cliente {
         byte[] buffer1 = new byte[256];
         byte[] buffer2 = new byte[256];
         HashSet<String> topicoSubscriptos=new HashSet<>();
+        DatagramSocket socketUDP = new DatagramSocket();
         while(true) {
             try {
 
@@ -46,7 +47,7 @@ public class Cliente {
                 InetAddress direccionServidor = InetAddress.getByName("127.0.0.1");
 
                 //Creo el socket de UDP
-                DatagramSocket socketUDP = new DatagramSocket();
+
 
                 // creo un hilo para recibir msgs
 //                ThreadCliente hiloEscucha = new ThreadCliente(socketUDP);
@@ -97,8 +98,8 @@ public class Cliente {
 
                     }
 
-                    //cierro el socket
-                    socketUDP.close();
+                    //cierro el socke
+                    // socketUDP.close();
                 } else {
                     System.out.println("Ingrese un mensaje con el formato correcto. El mismo sería: mensaje#tópico");
                 }
