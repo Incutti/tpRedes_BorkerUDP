@@ -34,10 +34,6 @@ public class Servidor {
     public static void main(String[] args) {
 
         Servidor servidor = new Servidor();
-        //HashSet<String> ipPuerto = new HashSet<>();
-        //ipPuerto.add("127.0.0.1:5565");
-        //servidor.getCanales().put("futbol", ipPuerto);
-        // eso es solo para llenar con algo
 
         HashMap<InetAddress,Integer>clientes=new HashMap<>();
         final int PUERTO = 5001;
@@ -70,16 +66,13 @@ public class Servidor {
                     String ipMasPuerto="";
                     topico=mensajeConCanal.split("#")[1];
                     topico=topico.split("/")[0];
-//                    for (int i = mensajeConCanal.indexOf("#"); i < mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"), mensajeConCanal.length()-1).length(); i++) {
-//                        topico = topico + mensajeConCanal.charAt(i);
-//                    }
+
                     System.out.println("SubsTop#" + topico);
                     if(!(clientes.containsKey(peticion.getAddress()))){
                         clientes.put(peticion.getAddress(),peticion.getPort());
                     }
                     ipMasPuerto = peticion.getAddress().toString() + ":" + peticion.getPort();
                     ipMasPuerto=ipMasPuerto.substring(1, ipMasPuerto.length());
-                    //System.out.println(ipMasPuerto);
                     if(servidor.getCanales().containsKey(topico)) {
                         servidor.getCanales().get(topico).add(ipMasPuerto);
                     } else{
@@ -87,14 +80,7 @@ public class Servidor {
                         auxiliar.add("/" + ipMasPuerto);
                         servidor.getCanales().put(topico,auxiliar);
                     }
-                    /*for(Map.Entry<String, HashSet<String>> canales : servidor.getCanales().entrySet()){
-                        if(canales.getKey().equals(topico)){
-                            for (String suscrpitor: canales.getValue()) {
-                                System.out.println(suscrpitor);
-                            }
-                        }
-
-                    }*/ // para probar que suscriba bien
+                   // para probar que suscriba bien
                     int puertoCliente = peticion.getPort();
                     InetAddress direccion = peticion.getAddress();
 
@@ -120,7 +106,6 @@ public class Servidor {
                     }
                     System.out.println(mensaje);
                     //Obtengo el puerto y la direccion de origen
-                    //Si no se quiere responder, no es necesario
 
                     int puertoCliente = peticion.getPort();
                     InetAddress direccion = peticion.getAddress();
@@ -144,9 +129,6 @@ public class Servidor {
 
                     String canal = "";
 
-                    //                  for (int i = 0; i < mensajeConCanal.subSequence(mensajeConCanal.indexOf("#"), mensajeConCanal.length() - 1).length(); i++) {
-                    //                    canal = canal + mensajeConCanal.charAt(i);
-                    //              }
                     canal=mensajeConCanal.split("#")[1];
                     canal=canal.split("/")[0];
 
@@ -156,12 +138,7 @@ public class Servidor {
                             for (String anna : canales.getValue()) {
                                 for(Map.Entry<InetAddress, Integer> clients : clientes.entrySet()){
                                     if(clients.getKey().toString().equals(anna.split(":")[0])){
-                                        //String ip= (String) anna.subSequence(0, anna.indexOf(":")-1);
-//                                InetAddress ipSubscriptor = InetAddress.getByName((String) anna.subSequence(0, anna.indexOf(":")));
-//                                String puertoaux = (String) anna.subSequence(anna.indexOf(":"), anna.length() - 1);
-                                        //String puertoaux=anna.split(":")[1];
-                                        //int puertoSubscriptor = Integer.parseInt(puertoaux);
-                                        //byte[] bufferBroker = new byte[256];
+
                                         String mensajeReenviado = mensaje;
                                         buffer1 = mensajeReenviado.getBytes();
 

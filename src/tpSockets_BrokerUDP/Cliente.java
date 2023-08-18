@@ -47,6 +47,11 @@ public class Cliente {
 
                 //Creo el socket de UDP
                 DatagramSocket socketUDP = new DatagramSocket();
+
+                // creo un hilo para recibir msgs
+//                ThreadCliente hiloEscucha = new ThreadCliente(socketUDP);
+//                hiloEscucha.start();
+
                 String mensajeConCanal /*="¡hola!#futbol"*/;
                 mensajeConCanal = scanner.nextLine();
                 String topico="";
@@ -91,8 +96,6 @@ public class Cliente {
                         }
 
                     }
-
-
 
                     //cierro el socket
                     socketUDP.close();
