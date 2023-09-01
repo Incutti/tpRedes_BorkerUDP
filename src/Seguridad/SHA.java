@@ -24,7 +24,7 @@ public class SHA{
         return hexString.toString();
     }
 
-    public static Boolean comprobacion(String hash1, String hash2){
-        return hash1.equals(hash2);
+    public static Boolean comprobacion(String hash, String hash2){
+        return hash.equals(hash2);
     }
 }
