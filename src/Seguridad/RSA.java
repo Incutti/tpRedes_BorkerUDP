@@ -33,21 +33,45 @@ public class RSA {
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
+    public RSA(){
+        try {
+        KeyPairGenerator keyPairGenerator = null;
+        keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048); //1024 used for normal securities
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
+        publicKey = keyPair.getPublic();
+        privateKey = keyPair.getPrivate();
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public PrivateKey getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(PrivateKey privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
 
     public static void main(String[] args) throws IOException {
 
-        try {
-            System.out.println("-------GENERATE PUBLIC and PRIVATE KEY-------------");
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048); //1024 used for normal securities
-            KeyPair keyPair = keyPairGenerator.generateKeyPair();
-            PublicKey publicKey = keyPair.getPublic();
-            PrivateKey privateKey = keyPair.getPrivate();
-            System.out.println("Public Key - " + publicKey);
-            System.out.println("Private Key - " + privateKey);
-
-            //Pullingout parameters which makes up Key
+        RSA rsaObj = new RSA();
+//        System.out.println("-------GENERATE PUBLIC and PRIVATE KEY-------------");
+//        System.out.println(rsaObj.getPrivateKey());
+//        System.out.println(rsaObj.getPublicKey());
+        //Pullingout parameters which makes up Key
 //            System.out.println("\n------- PULLING OUT PARAMETERS WHICH MAKES KEYPAIR----------\n");
 //            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 //            /*publica*/RSAPublicKeySpec rsaPubKeySpec = keyFactory.getKeySpec(publicKey, RSAPublicKeySpec.class);
@@ -58,22 +82,18 @@ public class RSA {
 //           System.out.println("PrivKey Modulus : " + rsaPrivKeySpec.getModulus());
 //           System.out.println("PrivKey Exponent : " + rsaPrivKeySpec.getPrivateExponent());
 
-            //Share public key with other, so they can encrypt data and decrypt thoses using private key(Don't share with Other)
+        //Share public key with other, so they can encrypt data and decrypt thoses using private key(Don't share with Other)
 //            System.out.println("\n--------SAVING PUBLIC KEY AND PRIVATE KEY TO FILES-------\n");
-            RSA rsaObj = new RSA();
 //            rsaObj.saveKeys(PUBLIC_KEY_FILE, rsaPubKeySpec.getModulus(), rsaPubKeySpec.getPublicExponent());
 //            rsaObj.saveKeys(PRIVATE_KEY_FILE, rsaPrivKeySpec.getModulus(), rsaPrivKeySpec.getPrivateExponent());
 
-            //Encrypt Data using Public Key
-            byte[] encryptedData = rsaObj.encryptData("Anuj Patel - Classified Information !", publicKey);
+        //Encrypt Data using Public Key
+        byte[] encryptedData = rsaObj.encryptData("Anuj Patel - Classified Information !", rsaObj.getPublicKey());
 
-            //Descypt Data using Private Key
-            rsaObj.decryptData(encryptedData,privateKey);
+        //Descypt Data using Private Key
+        rsaObj.decryptData(encryptedData,rsaObj.getPrivateKey());
 
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-//        catch (InvalidKeySpecException e) {
+        //        catch (InvalidKeySpecException e) {
 //            e.printStackTrace();
 //        }
 

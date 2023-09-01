@@ -1,5 +1,7 @@
 package Seguridad.Comunicacion;
 
+import Seguridad.RSA;
+
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -24,7 +26,7 @@ public class Cliente {
 //    }
 
     public static void main(String[] args) throws SocketException {
-
+        RSA rsaObj = new RSA();
         Scanner scanner = new Scanner(System.in);
         //puerto del servidor
         final int PUERTO_SERVIDOR = 5001;
@@ -34,6 +36,18 @@ public class Cliente {
         byte[] buffer2 = new byte[256];
         HashSet<String> topicoSubscriptos=new HashSet<>();
         DatagramSocket socketUDP = new DatagramSocket();
+        InetAddress direccionServidor = null;
+
+
+        try {
+            direccionServidor = InetAddress.getByName("127.0.0.1");
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        byte[] bufferClaves = new byte[256];
+
         while(true) {
             try {
                 Thread hiloAck = new Thread(new ThreadCLiente(socketUDP));
@@ -41,7 +55,7 @@ public class Cliente {
                 hiloAck.start();
                 hiloEscucha1.start();
                 //Obtengo la localizacion de localhost
-                InetAddress direccionServidor = InetAddress.getByName("127.0.0.1");
+
 
                 //Creo el socket de UDP
 
@@ -106,8 +120,6 @@ public class Cliente {
                     System.out.println("Ingrese un mensaje con el formato correcto. El mismo sería: mensaje#tópico/");
                 }
             } catch (SocketException ex) {
-                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (UnknownHostException ex) {
                 Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
