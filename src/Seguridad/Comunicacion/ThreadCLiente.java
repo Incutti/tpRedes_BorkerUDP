@@ -1,6 +1,7 @@
 package Seguridad.Comunicacion;
 
 import Seguridad.RSA;
+import Seguridad.SHA;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -31,5 +32,9 @@ public class ThreadCLiente implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String corroboracion(String mensaje){
+        return SHA.hashear(mensaje); //falta compararlo con el mensaje hasheado
     }
 }
