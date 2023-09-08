@@ -4,29 +4,35 @@ import Seguridad.RSA;
 
 import java.io.IOException;
 import java.net.*;
+import java.nio.Buffer;
 import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Cliente {
-//    private String canal;
-//
-//    public Cliente(String canal) {
-//        this.canal = canal;
-//    }
-//
-//    public String getCanal() {
-//        return canal;
-//    }
-//
-//    public void setCanal(String canal) {
-//        this.canal = canal;
-//    }
+    private static PublicKey publicaServidor;
 
-    public static void main(String[] args) throws SocketException {
-        RSA rsaObj = new RSA();
+    public static PublicKey getPublicaServidor() {
+        return publicaServidor;
+    }
+
+    public static void setPublicaServidor(PublicKey publicaServidor) {
+        Cliente.publicaServidor = publicaServidor;
+    }
+
+
+    public static void main(String[] args) throws IOException {
+        PublicKey publicKey;
+        PrivateKey privateKey;
+        KeyPair keyPair=RSA.RSA();
+        privateKey=keyPair.getPrivate();
+        publicKey=keyPair.getPublic();
+
         Scanner scanner = new Scanner(System.in);
         //puerto del servidor
         final int PUERTO_SERVIDOR = 5001;
@@ -46,12 +52,27 @@ public class Cliente {
         }
 
 
-        byte[] bufferClaves = new byte[256];
+        byte[] bufferClaves = publicKey.getEncoded();
+        DatagramPacket envioClaves = new DatagramPacket(bufferClaves, bufferClaves.length, direccionServidor, PUERTO_SERVIDOR);
+        socketUDP.send(envioClaves);
+
+
+        DatagramPacket reciboClaveServer = new DatagramPacket(buffer1, buffer1.length);
+        socketUDP.receive(reciboClaveServer);
+        try {
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            publicaServidor =  kf.generatePublic(new X509EncodedKeySpec(reciboClaveServer.getData()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
+
 
         while(true) {
             try {
-                Thread hiloAck = new Thread(new ThreadCLiente(socketUDP));
-                Thread hiloEscucha1 = new Thread(new ThreadCLiente(socketUDP));
+                Thread hiloAck = new Thread(new ThreadCLiente(socketUDP,privateKey));
+                Thread hiloEscucha1 = new Thread(new ThreadCLiente(socketUDP,privateKey));
                 hiloAck.start();
                 hiloEscucha1.start();
                 //Obtengo la localizacion de localhost
@@ -66,6 +87,8 @@ public class Cliente {
 
                 String mensajeConCanal /*="¡hola!#futbol/"*/;
                 mensajeConCanal = scanner.nextLine();
+                /*PARTE FIRMA*/ byte[] bufferFirma=RSA.signData(mensajeConCanal,privateKey);
+                buffer = RSA.encryptData(mensajeConCanal, publicaServidor);
                 if(mensajeConCanal.contains("#")) {
                     String topico="";
                     topico=mensajeConCanal.split("#")[1];
@@ -75,8 +98,7 @@ public class Cliente {
                     }
 
                     //Convierto el mensaje a bytes
-                    buffer = mensajeConCanal.getBytes(StandardCharsets.UTF_8);
-
+//                     buffer = mensajeConCanal.getBytes(StandardCharsets.UTF_8);
 
                     //Creo un datagrama
                     DatagramPacket pregunta = new DatagramPacket(buffer, buffer.length, direccionServidor, PUERTO_SERVIDOR);

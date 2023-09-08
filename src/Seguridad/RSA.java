@@ -30,40 +30,37 @@ public class RSA {
 
 //    private static final String PUBLIC_KEY_FILE = "Public.key";
 //    private static final String PRIVATE_KEY_FILE = "Private.key";
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+//    private PrivateKey privateKey;
+//    private PublicKey publicKey;
 
-    public RSA(){
+    public static KeyPair RSA() {
+        KeyPair keyPair;
         try {
-        KeyPairGenerator keyPairGenerator = null;
-        keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(2048); //1024 used for normal securities
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-
-        publicKey = keyPair.getPublic();
-        privateKey = keyPair.getPrivate();
-
+            KeyPairGenerator keyPairGenerator = null;
+            keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048); //1024 used for normal securities
+            keyPair = keyPairGenerator.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-
+        return keyPair;
     }
 
-    public PrivateKey getPrivateKey() {
-        return privateKey;
-    }
-
-    public void setPrivateKey(PrivateKey privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    public PublicKey getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
-    }
+//    public PrivateKey getPrivateKey() {
+//        return privateKey;
+//    }
+//
+//    public void setPrivateKey(PrivateKey privateKey) {
+//        this.privateKey = privateKey;
+//    }
+//
+//    public PublicKey getPublicKey() {
+//        return publicKey;
+//    }
+//
+//    public void setPublicKey(PublicKey publicKey) {
+//        this.publicKey = publicKey;
+//    }
 
     public static void main(String[] args) throws IOException {
 
@@ -88,10 +85,10 @@ public class RSA {
 //            rsaObj.saveKeys(PRIVATE_KEY_FILE, rsaPrivKeySpec.getModulus(), rsaPrivKeySpec.getPrivateExponent());
 
         //Encrypt Data using Public Key
-        byte[] encryptedData = rsaObj.encryptData("Anuj Patel - Classified Information !", rsaObj.getPublicKey());
+    // ENCRIPTAR    byte[] encryptedData = rsaObj.encryptData("Anuj Patel - Classified Information !", rsaObj.getPublicKey());
 
         //Descypt Data using Private Key
-        rsaObj.decryptData(encryptedData,rsaObj.getPrivateKey());
+    //DESENCRIPTAR    rsaObj.decryptData(encryptedData,rsaObj.getPrivateKey());
 
         //        catch (InvalidKeySpecException e) {
 //            e.printStackTrace();
@@ -138,7 +135,7 @@ public class RSA {
      * @param data
      * @throws IOException
      */
-    public byte[] encryptData(String data, PublicKey pubKey) throws IOException {
+    public static byte[] encryptData(String data, PublicKey pubKey) throws IOException {
         System.out.println("\n----------------ENCRYPTION STARTED------------");
 
         System.out.println("Data Before Encryption :" + data);
@@ -163,29 +160,31 @@ public class RSA {
      * @param data
      * @throws IOException
      */
-    public void decryptData(byte[] data, PrivateKey privateKey) throws IOException {
+    public static String  decryptData(byte[] data, PrivateKey privateKey) throws IOException {
         System.out.println("\n----------------DECRYPTION STARTED------------");
         byte[] descryptedData = null;
+        String mensaje = null;
 
         try {
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             descryptedData = cipher.doFinal(data);
-            System.out.println("Decrypted Data: " + new String(descryptedData));
+            mensaje = new String(descryptedData);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         System.out.println("----------------DECRYPTION COMPLETED------------");
+        return mensaje;
     }
-
-    /**
-     * read Public Key From File
-     * @param fileName
-     * @return PublicKey
-     * @throws IOException
-     */
+//
+//    /**
+//     * read Public Key From File
+//     * @param fileName
+//     * @return PublicKey
+//     * @throws IOException
+//     */
 //    public PublicKey readPublicKeyFromFile(String fileName) throws IOException{
 //        FileInputStream fis = null;
 //        ObjectInputStream ois = null;
@@ -217,12 +216,12 @@ public class RSA {
 //        return null;
 //    }
 
-    /**
-     * read Public Key From File
-     * @param fileName
-     * @return
-     * @throws IOException
-     */
+//    /**
+//     * read Public Key From File
+//     * @param fileName
+//     * @return
+//     * @throws IOException
+//     */
 //    public PrivateKey readPrivateKeyFromFile(String fileName) throws IOException{
 //        FileInputStream fis = null;
 //        ObjectInputStream ois = null;
@@ -253,4 +252,25 @@ public class RSA {
 //        }
 //        return null;
 //    }
+    public static byte[] signData(String data, PrivateKey privKey) throws IOException {
+        System.out.println("\n----------------ENCRYPTION STARTED------------");
+
+        System.out.println("Data Before Hashing :"+data);
+        data=SHA.hashear(data);
+        System.out.println("Data Before Encryption :" + data);
+        byte[] dataToEncrypt = data.getBytes();
+        byte[] encryptedData = null;
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, privKey);
+            encryptedData = cipher.doFinal(dataToEncrypt);
+            System.out.println("Encryted Data: " + encryptedData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("----------------ENCRYPTION COMPLETED------------");
+        return encryptedData;
+    }
 }
