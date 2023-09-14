@@ -4,7 +4,7 @@ public class MensajeEncriptado {
     private byte[] mensajeHasheadoPrivada;
     private byte[] mensajeEncriptadoPublica;
 
-    private static String separador="separador";
+
 
 
 
@@ -29,11 +29,4 @@ public class MensajeEncriptado {
         this.mensajeEncriptadoPublica = mensajeEncriptadoPublica;
     }
 
-    public static String getSeparador() {
-        return separador;
-    }
-
-    public static void setSeparador(String separador) {
-        MensajeEncriptado.separador = separador;
-    }
 }

@@ -1,6 +1,7 @@
 package Seguridad.Comunicacion;
 
 import Seguridad.RSA;
+import Seguridad.SHA;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -60,21 +61,26 @@ public class Servidor {
 
             //Siempre atendera peticiones
             while (true) {
-                byte[] buffer = new byte[256];
+                byte[] buffer = new byte[2048];
                 //Preparo la respuesta
                 DatagramPacket peticion = new DatagramPacket(buffer, buffer.length);
 
                 //Recibo el datagrama
                 socketUDP.receive(peticion);
 
+                MensajeEncriptado mensajeEncriptado1 = (MensajeEncriptado) Cliente.convertBytesToObject(peticion.getData());
+                String mensajeConCanal=(RSA.decryptData(mensajeEncriptado1.getMensajeEncriptadoPublica(),privateKey)); // DESENCRIPTO MENSAJE
+
                 String conjuntoIpPuerto=peticion.getAddress().toString()+":"+peticion.getPort();
+
                 if(Servidor.clientes.containsKey(conjuntoIpPuerto)){
 
                     System.out.println("~me llega lo siguiente~");
 
                     //Convierto lo recibido y mostrar el mensaje
-                    byte[] a = peticion.getData();
-                    String mensajeConCanal = RSA.decryptData(a,privateKey/*clave privada del srv*/);
+                    // byte[] a = peticion.getData();
+                    // LO HAGO ARRIBA
+                    // String mensajeConCanal = RSA.decryptData(a,privateKey/*clave privada del srv*/);
                     //String mensajeConCanal = new String(peticion.getData());
 
 
@@ -157,19 +163,22 @@ public class Servidor {
 
                         canal=mensajeConCanal.split("#")[1];
                         canal=canal.split("/")[0];
-
+                        // TERMINAR ESTO Y TERMINAMOS LA PARTE LOGICA ????
                         System.out.println("~Se reenvió el mensaje a estas IPs: ~");
                         for (Map.Entry<String, HashMap<String, PublicKey>> canals : Servidor.getCanales().entrySet()) {
                             if (canals.getKey().equals(canal)) {
                                 for (Map.Entry<String,PublicKey> anna:canals.getValue().entrySet()) {
 
-                                    String mensajeReenviado = mensaje;
-//                                   byte [] bufferEncriptacion = mensajeReenviado.getBytes();
-                                    byte [] bufferEncriptacion = RSA.encryptData(mensajeReenviado,anna.getValue());
+                                    byte [] bufferComprobacion = RSA.signData(SHA.hashear(mensaje),privateKey);
+//                                  byte [] bufferEncriptacion = mensajeReenviado.getBytes();
+                                    byte [] bufferEncriptacion = RSA.encryptData(mensaje,anna.getValue());
+
+                                    MensajeEncriptado mensajeCliente= new MensajeEncriptado(bufferComprobacion,bufferEncriptacion);
+                                    byte [] mensajePadre =Cliente.convertObjectToBytes(mensajeCliente);
                                     String ip = anna.getKey().split(":")[0];
                                     String puerto = anna.getKey().split(":")[1];
                                     //creo el datagrama
-                                    DatagramPacket paqueteBroker = new DatagramPacket(bufferEncriptacion, bufferEncriptacion.length, InetAddress.getByName(ip),Integer.valueOf(puerto));
+                                    DatagramPacket paqueteBroker = new DatagramPacket(mensajePadre, mensajePadre.length, InetAddress.getByName(ip),Integer.valueOf(puerto));
 
                                     //Envio la información
                                     socketUDP.send(paqueteBroker);
