@@ -60,8 +60,8 @@ public class RSA {
 //
 //    public void setPublicKey(PublicKey publicKey) {
 //        this.publicKey = publicKey;
-//    }
 
+//    }
     public static void main(String[] args) throws IOException {
 
         RSA rsaObj = new RSA();
@@ -178,6 +178,28 @@ public class RSA {
         System.out.println("----------------DECRYPTION COMPLETED------------");
         return mensaje;
     }
+
+    public static byte[] signData(String data, PrivateKey privKey) throws IOException {
+        System.out.println("\n----------------ENCRYPTION STARTED------------");
+
+        System.out.println("Data Before Hashing :"+data);
+        data=SHA.hashear(data);
+        System.out.println("Data Before Encryption :" + data);
+        byte[] dataToEncrypt = data.getBytes();
+        byte[] encryptedData = null;
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, privKey);
+            encryptedData = cipher.doFinal(dataToEncrypt);
+            System.out.println("Encryted Data: " + encryptedData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("----------------ENCRYPTION COMPLETED------------");
+        return encryptedData;
+    }
 //
 //    /**
 //     * read Public Key From File
@@ -214,8 +236,8 @@ public class RSA {
 //            }
 //        }
 //        return null;
-//    }
 
+//    }
 //    /**
 //     * read Public Key From File
 //     * @param fileName
@@ -252,25 +274,4 @@ public class RSA {
 //        }
 //        return null;
 //    }
-    public static byte[] signData(String data, PrivateKey privKey) throws IOException {
-        System.out.println("\n----------------ENCRYPTION STARTED------------");
-
-        System.out.println("Data Before Hashing :"+data);
-        data=SHA.hashear(data);
-        System.out.println("Data Before Encryption :" + data);
-        byte[] dataToEncrypt = data.getBytes();
-        byte[] encryptedData = null;
-        try {
-            Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE, privKey);
-            encryptedData = cipher.doFinal(dataToEncrypt);
-            System.out.println("Encryted Data: " + encryptedData);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("----------------ENCRYPTION COMPLETED------------");
-        return encryptedData;
-    }
 }

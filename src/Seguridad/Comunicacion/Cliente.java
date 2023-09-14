@@ -87,8 +87,15 @@ public class Cliente {
 
                 String mensajeConCanal /*="¡hola!#futbol/"*/;
                 mensajeConCanal = scanner.nextLine();
-                /*PARTE FIRMA*/ byte[] bufferFirma=RSA.signData(mensajeConCanal,privateKey);
+
+                /*PARTE FIRMA*/
+                byte[] bufferFirma=RSA.signData(mensajeConCanal,privateKey);
                 buffer = RSA.encryptData(mensajeConCanal, publicaServidor);
+
+                MensajeEncriptado mensajeEncriptado = new MensajeEncriptado(bufferFirma, buffer);
+                // EN ESTA LINEA TENGO QUE VER COMO HACER PARA GUARDAR ESTA VARIABLE COMO BYTE[]
+                
+
                 if(mensajeConCanal.contains("#")) {
                     String topico="";
                     topico=mensajeConCanal.split("#")[1];
@@ -115,8 +122,6 @@ public class Cliente {
                    System.out.println("Recibo la confimación");
 
 
-
-
                     //Cojo los datos y lo muestro
                     //String mensaje1 = new String(peticion.getData());
                     //System.out.println(mensaje1);
@@ -133,10 +138,9 @@ public class Cliente {
                              //   System.out.println(mensaje2);
                             }
                         }
-
                     }
 
-                    //cierro el socke
+                    //cierro el socket
                     // socketUDP.close();
                 } else {
                     System.out.println("Ingrese un mensaje con el formato correcto. El mismo sería: mensaje#tópico/");

@@ -1,7 +1,5 @@
 package Seguridad;
 
-import com.sun.xml.internal.fastinfoset.algorithm.HexadecimalEncodingAlgorithm;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
