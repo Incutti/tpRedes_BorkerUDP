@@ -2,7 +2,7 @@ package Seguridad.Comunicacion;
 
 import Seguridad.RSA;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.nio.Buffer;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +23,27 @@ public class Cliente {
 
     public static void setPublicaServidor(PublicKey publicaServidor) {
         Cliente.publicaServidor = publicaServidor;
+    }
+
+    public static byte[] convertObjectToBytes(MensajeEncriptado mensaje) {
+        ByteArrayOutputStream boas = new ByteArrayOutputStream();
+        try (ObjectOutputStream ois = new ObjectOutputStream(boas)) {
+            ois.writeObject(mensaje);
+            return boas.toByteArray();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        throw new RuntimeException();
+    }
+
+    public static Object convertBytesToObject(byte[] bytes) {
+        InputStream is = new ByteArrayInputStream(bytes);
+        try (ObjectInputStream ois = new ObjectInputStream(is)) {
+            return ois.readObject();
+        } catch (IOException | ClassNotFoundException ioe) {
+            ioe.printStackTrace();
+        }
+        throw new RuntimeException();
     }
 
 
@@ -93,8 +114,11 @@ public class Cliente {
                 buffer = RSA.encryptData(mensajeConCanal, publicaServidor);
 
                 MensajeEncriptado mensajeEncriptado = new MensajeEncriptado(bufferFirma, buffer);
-                // EN ESTA LINEA TENGO QUE VER COMO HACER PARA GUARDAR ESTA VARIABLE COMO BYTE[]
-                
+                // EN LA LINEA DE ABAJO GUARDO ESTA VARIABLE COMO BYTE[]
+                byte[] bufferEncriptadoCompleto = convertObjectToBytes(mensajeEncriptado);
+
+                // CONVERTIR DATOS DEL BUFFER A OBJETO
+                //MensajeEncriptado mensajeEncriptado1 = (MensajeEncriptado) convertBytesToObject(bufferEncriptadoCompleto);
 
                 if(mensajeConCanal.contains("#")) {
                     String topico="";
@@ -108,7 +132,7 @@ public class Cliente {
 //                     buffer = mensajeConCanal.getBytes(StandardCharsets.UTF_8);
 
                     //Creo un datagrama
-                    DatagramPacket pregunta = new DatagramPacket(buffer, buffer.length, direccionServidor, PUERTO_SERVIDOR);
+                    DatagramPacket pregunta = new DatagramPacket(bufferEncriptadoCompleto, bufferEncriptadoCompleto.length, direccionServidor, PUERTO_SERVIDOR);
 
                     //Lo envío con send
                     System.out.println("Envío el datagrama");

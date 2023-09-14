@@ -179,6 +179,25 @@ public class RSA {
         return mensaje;
     }
 
+    public static String decryptHashData(byte[] data, PublicKey publicKey) throws IOException {
+        System.out.println("\n----------------DECRYPTION STARTED------------");
+        byte[] descryptedData = null;
+        String mensaje = null;
+
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.DECRYPT_MODE, publicKey);
+            descryptedData = cipher.doFinal(data);
+            mensaje = new String(descryptedData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("----------------DECRYPTION COMPLETED------------");
+        return mensaje;
+    }
+
     public static byte[] signData(String data, PrivateKey privKey) throws IOException {
         System.out.println("\n----------------ENCRYPTION STARTED------------");
 
