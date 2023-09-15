@@ -1,32 +1,35 @@
 package Seguridad.Comunicacion;
 
-public class MensajeEncriptado {
-    private byte[] mensajeHasheadoPrivada;
-    private byte[] mensajeEncriptadoPublica;
+import java.io.Serializable;
+import java.util.Base64;
 
+public class MensajeEncriptado implements Serializable {
+    private String mensajeHasheadoPrivada;
+    private String mensajeEncriptadoPublica;
 
-
-
-
-    public MensajeEncriptado(byte[] mensajeHasheadoPrivada, byte[] mensajeEncriptadoPublica) {
+    public MensajeEncriptado(String mensajeHasheadoPrivada, String mensajeEncriptadoPublica) {
         this.mensajeHasheadoPrivada = mensajeHasheadoPrivada;
         this.mensajeEncriptadoPublica = mensajeEncriptadoPublica;
     }
 
-    public byte[] getMensajeHasheadoPrivada() {
+    public String getMensajeHasheadoPrivada() {
         return mensajeHasheadoPrivada;
     }
 
-    public void setMensajeHasheadoPrivada(byte[] mensajeHasheadoPrivada) {
+    public void setMensajeHasheadoPrivada(String mensajeHasheadoPrivada) {
         this.mensajeHasheadoPrivada = mensajeHasheadoPrivada;
     }
 
-    public byte[] getMensajeEncriptadoPublica() {
+    public String getMensajeEncriptadoPublica() {
         return mensajeEncriptadoPublica;
     }
 
-    public void setMensajeEncriptadoPublica(byte[] mensajeEncriptadoPublica) {
+    public void setMensajeEncriptadoPublica(String mensajeEncriptadoPublica) {
         this.mensajeEncriptadoPublica = mensajeEncriptadoPublica;
     }
 
+    public static byte[] reconvertirBuffer(String mensaje){
+        byte[] decodedBytes = Base64.getDecoder().decode(mensaje);
+        return decodedBytes;
+    }
 }

@@ -182,7 +182,7 @@ public class RSA {
     public static String decryptHashData(byte[] data, PublicKey publicKey) throws IOException {
         System.out.println("\n----------------DECRYPTION STARTED------------");
         byte[] descryptedData = null;
-        String mensaje = null;
+        String mensaje = new String();
 
         try {
             Cipher cipher = Cipher.getInstance("RSA");

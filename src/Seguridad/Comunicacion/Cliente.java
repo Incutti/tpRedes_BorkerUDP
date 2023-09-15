@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -26,14 +27,14 @@ public class Cliente {
     }
 
     public static byte[] convertObjectToBytes(MensajeEncriptado mensaje) {
-        ByteArrayOutputStream boas = new ByteArrayOutputStream();
-        try (ObjectOutputStream ois = new ObjectOutputStream(boas)) {
-            ois.writeObject(mensaje);
-            return boas.toByteArray();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        throw new RuntimeException();
+       ByteArrayOutputStream boas = new ByteArrayOutputStream();
+       try (ObjectOutputStream ois = new ObjectOutputStream(boas)) {
+           ois.writeObject(mensaje);
+           return boas.toByteArray();
+       } catch (IOException ioe) {
+           ioe.printStackTrace();
+       }
+       throw new RuntimeException();
     }
 
     public static Object convertBytesToObject(byte[] bytes) {
@@ -58,8 +59,8 @@ public class Cliente {
         //puerto del servidor
         final int PUERTO_SERVIDOR = 5001;
         //buffer donde se almacenara los mensajes
-        byte[] buffer = new byte[256];
-        byte[] buffer1 = new byte[256];
+//        byte[] buffer = new byte[256];
+        byte[] buffer1 = new byte[2048];
         byte[] buffer2 = new byte[256];
         HashSet<String> topicoSubscriptos=new HashSet<>();
         DatagramSocket socketUDP = new DatagramSocket();
@@ -111,9 +112,9 @@ public class Cliente {
 
                 /*PARTE FIRMA*/
                 byte[] bufferFirma=RSA.signData(mensajeConCanal,privateKey);
-                buffer = RSA.encryptData(mensajeConCanal, publicaServidor);
+                byte[] buffer = RSA.encryptData(mensajeConCanal, publicaServidor);
 
-                MensajeEncriptado mensajeEncriptado = new MensajeEncriptado(bufferFirma, buffer);
+                MensajeEncriptado mensajeEncriptado = new MensajeEncriptado(Base64.getEncoder().encodeToString(bufferFirma), Base64.getEncoder().encodeToString(buffer));
                 // EN LA LINEA DE ABAJO GUARDO ESTA VARIABLE COMO BYTE[]
                 byte[] bufferEncriptadoCompleto = convertObjectToBytes(mensajeEncriptado);
 
