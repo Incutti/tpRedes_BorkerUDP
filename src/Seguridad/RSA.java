@@ -63,7 +63,6 @@ public class RSA {
 
 //    }
     public static void main(String[] args) throws IOException {
-
         RSA rsaObj = new RSA();
 //        System.out.println("-------GENERATE PUBLIC and PRIVATE KEY-------------");
 //        System.out.println(rsaObj.getPrivateKey());
@@ -93,7 +92,6 @@ public class RSA {
         //        catch (InvalidKeySpecException e) {
 //            e.printStackTrace();
 //        }
-
     }
 
     /**
@@ -138,7 +136,7 @@ public class RSA {
     public static byte[] encryptData(String data, PublicKey pubKey) throws IOException {
         System.out.println("\n----------------ENCRYPTION STARTED------------");
 
-        System.out.println("Data Before Encryption :" + data);
+        System.out.println("Original Data :" + data);
         byte[] dataToEncrypt = data.getBytes();
         byte[] encryptedData = null;
         try {
@@ -161,9 +159,9 @@ public class RSA {
      * @throws IOException
      */
     public static String  decryptData(byte[] data, PrivateKey privateKey) throws IOException {
-        System.out.println("\n----------------DECRYPTION STARTED------------");
+        //System.out.println("\n----------------DECRYPTION STARTED------------");
         byte[] descryptedData = null;
-        String mensaje = null;
+        String mensaje =null;
 
         try {
             Cipher cipher = Cipher.getInstance("RSA");
@@ -179,10 +177,10 @@ public class RSA {
         return mensaje;
     }
 
-    public static String decryptHashData(byte[] data, PublicKey publicKey) throws IOException {
-        System.out.println("\n----------------DECRYPTION STARTED------------");
+    public static String decryptHashData(byte[] data, PublicKey publicKey) throws IOException { // LO UNICO QUE CAMBIA CON DECRYPT NORMAL ES PRIVKEY O PUBKEY
+        //System.out.println("\n----------------HASH DECRYPTION STARTED------------");
         byte[] descryptedData = null;
-        String mensaje = new String();
+        String mensaje = null;
 
         try {
             Cipher cipher = Cipher.getInstance("RSA");
@@ -194,16 +192,16 @@ public class RSA {
             e.printStackTrace();
         }
 
-        System.out.println("----------------DECRYPTION COMPLETED------------");
+        System.out.println("----------------HASH DECRYPTION COMPLETED------------");
         return mensaje;
     }
 
     public static byte[] signData(String data, PrivateKey privKey) throws IOException {
-        System.out.println("\n----------------ENCRYPTION STARTED------------");
+        System.out.println("\n----------------SIGNING STARTED------------");
 
-        System.out.println("Data Before Hashing :"+data);
+        System.out.println("Original Data: " + data);
         data=SHA.hashear(data);
-        System.out.println("Data Before Encryption :" + data);
+        System.out.println("Hashed Data: " + data);
         byte[] dataToEncrypt = data.getBytes();
         byte[] encryptedData = null;
         try {
@@ -216,7 +214,7 @@ public class RSA {
             e.printStackTrace();
         }
 
-        System.out.println("----------------ENCRYPTION COMPLETED------------");
+        System.out.println("----------------SIGNING COMPLETED------------");
         return encryptedData;
     }
 //

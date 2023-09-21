@@ -56,9 +56,8 @@ public class Cliente {
         publicKey=keyPair.getPublic();
 
         Scanner scanner = new Scanner(System.in);
-        //puerto del servidor
-        final int PUERTO_SERVIDOR = 5001;
-        //buffer donde se almacenara los mensajes
+        final int PUERTO_SERVIDOR = 5001;//puerto del servidor
+        //buffers donde se almacenara a los mensajes
 //        byte[] buffer = new byte[256];
         byte[] buffer1 = new byte[2048];
         byte[] buffer2 = new byte[256];
