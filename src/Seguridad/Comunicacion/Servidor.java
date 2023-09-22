@@ -188,9 +188,11 @@ public class Servidor {
                                 for (Map.Entry<String,PublicKey> anna:canals.getValue().entrySet()) {
 
                                     String ip = anna.getKey().split(":")[0];
+                                    ip=ip.substring(1);
+                                    ip=ip.substring(1);
                                     String puerto = anna.getKey().split(":")[1];
 
-                                    ip=ip.split("/")[1];
+
 
                                     byte [] bufferComprobacion = RSA.signData(SHA.hashear(mensaje),privateKey);
 //                                  byte [] bufferEncriptacion = mensajeReenviado.getBytes();
