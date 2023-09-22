@@ -122,8 +122,9 @@ public class Servidor {
                             }
                         }
                         byte[] buffer2 = RSA.signData(ack,privateKey);
-                        MensajeEncriptado mensajeEncriptado=new MensajeEncriptado(Base64.getEncoder().encodeToString(buffer1),Base64.getEncoder().encodeToString(buffer2));
 
+                        // CAMBIO DE LUGAR LOS BYTES EN BUUFFER 1 POR el 2
+                        MensajeEncriptado mensajeEncriptado=new MensajeEncriptado(Base64.getEncoder().encodeToString(buffer2),Base64.getEncoder().encodeToString(buffer1));
 
                         //creo el datagrama
                         DatagramPacket respuesta = new DatagramPacket(Cliente.convertObjectToBytes(mensajeEncriptado), Cliente.convertObjectToBytes(mensajeEncriptado).length, direccion, puertoCliente);
@@ -163,11 +164,12 @@ public class Servidor {
                             }
                         }
                         byte[] buffer2 = RSA.signData(ack,privateKey);
-                        MensajeEncriptado mensajeEncriptado=new MensajeEncriptado(Base64.getEncoder().encodeToString(buffer1),Base64.getEncoder().encodeToString(buffer2));
+                        MensajeEncriptado mensajeEncriptado=new MensajeEncriptado(Base64.getEncoder().encodeToString(buffer2),Base64.getEncoder().encodeToString(buffer1));
 
+                        byte[] mensajeEncriptadocompleto=Cliente.convertObjectToBytes(mensajeEncriptado);
 
                         //creo el datagrama
-                        DatagramPacket respuesta = new DatagramPacket(Cliente.convertObjectToBytes(mensajeEncriptado), Cliente.convertObjectToBytes(mensajeEncriptado).length, direccion, puertoCliente);
+                        DatagramPacket respuesta = new DatagramPacket(mensajeEncriptadocompleto, mensajeEncriptadocompleto.length, direccion, puertoCliente);
 
                         //Envio la información
                         System.out.println("~respondí esto~");
@@ -185,14 +187,20 @@ public class Servidor {
                             if (canals.getKey().equals(canal)) {
                                 for (Map.Entry<String,PublicKey> anna:canals.getValue().entrySet()) {
 
+                                    String ip = anna.getKey().split(":")[0];
+                                    String puerto = anna.getKey().split(":")[1];
+
+                                    ip=ip.split("/")[1];
+
                                     byte [] bufferComprobacion = RSA.signData(SHA.hashear(mensaje),privateKey);
 //                                  byte [] bufferEncriptacion = mensajeReenviado.getBytes();
                                     byte [] bufferEncriptacion = RSA.encryptData(mensaje,anna.getValue());
 
                                     MensajeEncriptado mensajeCliente= new MensajeEncriptado(Base64.getEncoder().encodeToString(bufferComprobacion), Base64.getEncoder().encodeToString(bufferEncriptacion));
                                     byte [] mensajePadre =Cliente.convertObjectToBytes(mensajeCliente);
-                                    String ip = anna.getKey().split(":")[0];
-                                    String puerto = anna.getKey().split(":")[1];
+
+
+
                                     //creo el datagrama
                                     DatagramPacket paqueteBroker = new DatagramPacket(mensajePadre, mensajePadre.length, InetAddress.getByName(ip),Integer.valueOf(puerto));
 
@@ -209,6 +217,8 @@ public class Servidor {
                     PublicKey publicaCliente;
                     KeyFactory kf = KeyFactory.getInstance("RSA");
                     publicaCliente =  kf.generatePublic(new X509EncodedKeySpec(peticion.getData()));
+
+                    System.out.println("Se conectacto el siguiente cliente : " + conjuntoIpPuerto);
 
                     byte[] bufferClaves = publicKey.getEncoded();
                     int puerto = Integer.parseInt(conjuntoIpPuerto.split(":")[1]);

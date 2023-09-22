@@ -40,16 +40,23 @@ public class ThreadCLiente implements Runnable {
         try {
             byte[] buffer = new byte[4096];
             DatagramPacket paqueteRecibo =new DatagramPacket(buffer,buffer.length);
+
             System.out.println("Entro hilo escucha");
             socketUDP.receive(paqueteRecibo);
+
             MensajeEncriptado mensajeEncriptado1 = (MensajeEncriptado) Cliente.convertBytesToObject(paqueteRecibo.getData()); //Convierto de tipo buffer a tipo MensajeEncriptado
+
+            byte[] mensajeEncriptadoPublica = MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeEncriptadoPublica());
+
             String respuesta=(RSA.decryptData(MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeEncriptadoPublica()),privadaCliente));
+
+
             System.out.println("Respuesta del servidor: " + respuesta);
 
             if(ThreadCLiente.corroboracion(respuesta, MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeHasheadoPrivada()))){
                 System.out.println("El mensaje que llegó está íntegro.");
             } else {
-                System.out.println("Los datos han sido corrompidos en algún momento del envío.");
+                //  System.out.println("Los datos han sido corrompidos en algún momento del envío.");
             }
 
         } catch (IOException e) {

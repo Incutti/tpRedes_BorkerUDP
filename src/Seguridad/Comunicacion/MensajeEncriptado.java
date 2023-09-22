@@ -29,7 +29,8 @@ public class MensajeEncriptado implements Serializable {
     }
 
     public static byte[] reconvertirBuffer(String mensaje){
-        byte[] decodedBytes = Base64.getDecoder().decode(mensaje);
+        byte[] decodedBytes=new byte[4096];
+        decodedBytes = Base64.getDecoder().decode(mensaje);
         return decodedBytes;
     }
 }

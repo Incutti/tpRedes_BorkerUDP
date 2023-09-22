@@ -60,7 +60,7 @@ public class Cliente {
         //buffers donde se almacenara a los mensajes
 //        byte[] buffer = new byte[256];
         byte[] buffer1 = new byte[2048];
-        byte[] buffer2 = new byte[256];
+        byte[] buffer2 = new byte[2048];
         HashSet<String> topicoSubscriptos=new HashSet<>();
         DatagramSocket socketUDP = new DatagramSocket();
         InetAddress direccionServidor = null;
@@ -143,7 +143,7 @@ public class Cliente {
 
                    //Recibo la respuesta
                   // socketUDP.receive(peticion);
-                   System.out.println("Recibo la confimación");
+                   // System.out.println("Recibo la confimación");
 
 
                     //Cojo los datos y lo muestro

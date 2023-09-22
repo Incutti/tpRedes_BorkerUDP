@@ -160,13 +160,12 @@ public class RSA {
      */
     public static String  decryptData(byte[] data, PrivateKey privateKey) throws IOException {
         //System.out.println("\n----------------DECRYPTION STARTED------------");
-        byte[] descryptedData = null;
         String mensaje =null;
 
         try {
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            descryptedData = cipher.doFinal(data);
+            byte[]  descryptedData = cipher.doFinal(data);
             mensaje = new String(descryptedData);
 
         } catch (Exception e) {
@@ -178,7 +177,7 @@ public class RSA {
     }
 
     public static String decryptHashData(byte[] data, PublicKey publicKey) throws IOException { // LO UNICO QUE CAMBIA CON DECRYPT NORMAL ES PRIVKEY O PUBKEY
-        //System.out.println("\n----------------HASH DECRYPTION STARTED------------");
+        System.out.println("\n----------------HASH DECRYPTION STARTED------------");
         byte[] descryptedData = null;
         String mensaje = null;
 
