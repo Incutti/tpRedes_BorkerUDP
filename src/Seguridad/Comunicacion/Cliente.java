@@ -1,5 +1,6 @@
 package Seguridad.Comunicacion;
 
+import Seguridad.AES;
 import Seguridad.RSA;
 
 import java.io.*;
@@ -18,6 +19,8 @@ import java.util.logging.Logger;
 public class Cliente {
     private static PublicKey publicaServidor;
 
+    private static String contrasenaAsimetrica;
+
     public static PublicKey getPublicaServidor() {
         return publicaServidor;
     }
@@ -26,7 +29,15 @@ public class Cliente {
         Cliente.publicaServidor = publicaServidor;
     }
 
-    public static byte[] convertObjectToBytes(MensajeEncriptado mensaje) {
+    public static String getContrasenaAsimetrica() {
+        return contrasenaAsimetrica;
+    }
+
+    public static void setContrasenaAsimetrica(String contrasenaAsimetrica) {
+        Cliente.contrasenaAsimetrica = contrasenaAsimetrica;
+    }
+
+    public static byte[] convertObjectToBytes(Object mensaje) {
        ByteArrayOutputStream boas = new ByteArrayOutputStream();
        try (ObjectOutputStream ois = new ObjectOutputStream(boas)) {
            ois.writeObject(mensaje);
@@ -80,6 +91,29 @@ public class Cliente {
 
         DatagramPacket reciboClaveServer = new DatagramPacket(buffer1, buffer1.length);
         socketUDP.receive(reciboClaveServer);
+
+        byte[] buffer = new byte[4096];
+        DatagramPacket paqueteRecibo =new DatagramPacket(buffer,buffer.length);
+
+        byte[] paqueteva=new byte[1];
+        DatagramPacket paquetevacio=new DatagramPacket(paqueteva,1,direccionServidor, PUERTO_SERVIDOR);
+        socketUDP.send(paquetevacio);
+
+
+
+        System.out.println("Entro escucha");
+        socketUDP.receive(paqueteRecibo);
+
+        MensajeEncriptado mensajeEncriptado1 = (MensajeEncriptado) Cliente.convertBytesToObject(paqueteRecibo.getData()); //Convierto de tipo buffer a tipo MensajeEncriptado
+
+        byte[] mensajeEncriptadoPublica = MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeEncriptadoPublica());
+
+        String respuesta=(RSA.decryptData(MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeEncriptadoPublica()),privateKey));
+
+        if(respuesta.charAt(0) == '.') {
+            Cliente.setContrasenaAsimetrica(respuesta);
+        }
+
         try {
             KeyFactory kf = KeyFactory.getInstance("RSA");
             publicaServidor =  kf.generatePublic(new X509EncodedKeySpec(reciboClaveServer.getData()));
@@ -111,11 +145,11 @@ public class Cliente {
 
                 /*PARTE FIRMA*/
                 byte[] bufferFirma=RSA.signData(mensajeConCanal,privateKey);
-                byte[] buffer = RSA.encryptData(mensajeConCanal, publicaServidor);
+                String mensajeConAsimetrica = AES.encrypt(mensajeConCanal,contrasenaAsimetrica);
 
-                MensajeEncriptado mensajeEncriptado = new MensajeEncriptado(Base64.getEncoder().encodeToString(bufferFirma), Base64.getEncoder().encodeToString(buffer));
+                MensajeEncriptadoSimetrico mensajeEncriptadoSimetrico = new MensajeEncriptadoSimetrico(Base64.getEncoder().encodeToString(bufferFirma), mensajeConAsimetrica);
                 // EN LA LINEA DE ABAJO GUARDO ESTA VARIABLE COMO BYTE[]
-                byte[] bufferEncriptadoCompleto = convertObjectToBytes(mensajeEncriptado);
+                byte[] bufferEncriptadoCompleto = convertObjectToBytes(mensajeEncriptadoSimetrico);
 
                 // CONVERTIR DATOS DEL BUFFER A OBJETO
                 //MensajeEncriptado mensajeEncriptado1 = (MensajeEncriptado) convertBytesToObject(bufferEncriptadoCompleto);
@@ -137,7 +171,6 @@ public class Cliente {
                     //Lo envío con send
                     System.out.println("Envío el datagrama");
                     socketUDP.send(pregunta);
-
                     //Preparo la respuesta
                     //DatagramPacket peticion = new DatagramPacket(buffer1, buffer1.length);
 

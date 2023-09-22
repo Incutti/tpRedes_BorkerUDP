@@ -1,5 +1,6 @@
 package Seguridad.Comunicacion;
 
+import Seguridad.AES;
 import Seguridad.RSA;
 import Seguridad.SHA;
 
@@ -44,11 +45,11 @@ public class ThreadCLiente implements Runnable {
             System.out.println("Entro hilo escucha");
             socketUDP.receive(paqueteRecibo);
 
-            MensajeEncriptado mensajeEncriptado1 = (MensajeEncriptado) Cliente.convertBytesToObject(paqueteRecibo.getData()); //Convierto de tipo buffer a tipo MensajeEncriptado
+            MensajeEncriptadoSimetrico mensajeEncriptado1 = (MensajeEncriptadoSimetrico) Cliente.convertBytesToObject(paqueteRecibo.getData()); //Convierto de tipo buffer a tipo MensajeEncriptado
 
-            byte[] mensajeEncriptadoPublica = MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeEncriptadoPublica());
+//            byte[] mensajeEncriptadoPublica = MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeEncriptadoPublica());
 
-            String respuesta=(RSA.decryptData(MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeEncriptadoPublica()),privadaCliente));
+            String respuesta=(AES.decrypt(mensajeEncriptado1.getMensajeEncriptadoClave(), Cliente.getContrasenaAsimetrica()));
 
 
             System.out.println("Respuesta del servidor: " + respuesta);

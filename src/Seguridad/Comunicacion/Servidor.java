@@ -1,5 +1,6 @@
 package Seguridad.Comunicacion;
 
+import Seguridad.AES;
 import Seguridad.RSA;
 import Seguridad.SHA;
 
@@ -39,6 +40,7 @@ public class Servidor {
     }
 
     public static void main(String[] args) {
+        String contrasena = ".mondongo";
         PublicKey publicKey;
         PrivateKey privateKey;
         KeyPair keyPair=RSA.RSA();
@@ -70,8 +72,8 @@ public class Servidor {
 
                 if(Servidor.clientes.containsKey(conjuntoIpPuerto)){
 
-                    MensajeEncriptado mensajeEncriptado1 = (MensajeEncriptado) Cliente.convertBytesToObject(peticion.getData());
-                    String mensajeConCanal=(RSA.decryptData(MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeEncriptadoPublica()),privateKey)); // DESENCRIPTO MENSAJE
+                    MensajeEncriptadoSimetrico mensajeEncriptado1 = (MensajeEncriptadoSimetrico) Cliente.convertBytesToObject(peticion.getData());
+                    String mensajeConCanal=(AES.decrypt(mensajeEncriptado1.getMensajeEncriptadoClave(),contrasena)); // DESENCRIPTO MENSAJE
 
                     System.out.println("~me llega lo siguiente~");
 
@@ -113,21 +115,21 @@ public class Servidor {
                         int puertoCliente = peticion.getPort();
                         InetAddress direccion = peticion.getAddress();
 
-                        byte[] buffer1 = new byte[2048];
+                        String mensajeEncriptado = null;
 
                         String ack = "ACK";
                         for(Map.Entry<String,PublicKey> cliente: clientes.entrySet()){
                             if(conjuntoIpPuerto.equals(cliente.getKey())){
-                                buffer1 = RSA.encryptData(ack,cliente.getValue());
+                                mensajeEncriptado = AES.encrypt(ack,contrasena);
                             }
                         }
                         byte[] buffer2 = RSA.signData(ack,privateKey);
 
                         // CAMBIO DE LUGAR LOS BYTES EN BUUFFER 1 POR el 2
-                        MensajeEncriptado mensajeEncriptado=new MensajeEncriptado(Base64.getEncoder().encodeToString(buffer2),Base64.getEncoder().encodeToString(buffer1));
+                        MensajeEncriptadoSimetrico mensajeEncriptadoSimetrico=new MensajeEncriptadoSimetrico(Base64.getEncoder().encodeToString(buffer2),mensajeEncriptado);
 
                         //creo el datagrama
-                        DatagramPacket respuesta = new DatagramPacket(Cliente.convertObjectToBytes(mensajeEncriptado), Cliente.convertObjectToBytes(mensajeEncriptado).length, direccion, puertoCliente);
+                        DatagramPacket respuesta = new DatagramPacket(Cliente.convertObjectToBytes(mensajeEncriptadoSimetrico), Cliente.convertObjectToBytes(mensajeEncriptadoSimetrico).length, direccion, puertoCliente);
 
                         //Envio la información
                         System.out.println("~respondí esto~");
@@ -155,18 +157,19 @@ public class Servidor {
 //                        }
 
 
-                        byte[] buffer1 = new byte[2048];
+                        String mensajeEncriptado = null;
 
                         String ack = "ACK";
                         for(Map.Entry<String,PublicKey> cliente: clientes.entrySet()){
                             if(conjuntoIpPuerto.equals(cliente.getKey())){
-                                buffer1 = RSA.encryptData(ack,cliente.getValue());
+                                mensajeEncriptado = AES.encrypt(ack,contrasena);
                             }
                         }
                         byte[] buffer2 = RSA.signData(ack,privateKey);
-                        MensajeEncriptado mensajeEncriptado=new MensajeEncriptado(Base64.getEncoder().encodeToString(buffer2),Base64.getEncoder().encodeToString(buffer1));
 
-                        byte[] mensajeEncriptadocompleto=Cliente.convertObjectToBytes(mensajeEncriptado);
+                        MensajeEncriptadoSimetrico mensajeEncriptadoSimetrico=new MensajeEncriptadoSimetrico(Base64.getEncoder().encodeToString(buffer2),mensajeEncriptado);
+
+                        byte[] mensajeEncriptadocompleto=Cliente.convertObjectToBytes(mensajeEncriptadoSimetrico);
 
                         //creo el datagrama
                         DatagramPacket respuesta = new DatagramPacket(mensajeEncriptadocompleto, mensajeEncriptadocompleto.length, direccion, puertoCliente);
@@ -196,10 +199,10 @@ public class Servidor {
 
                                     byte [] bufferComprobacion = RSA.signData(SHA.hashear(mensaje),privateKey);
 //                                  byte [] bufferEncriptacion = mensajeReenviado.getBytes();
-                                    byte [] bufferEncriptacion = RSA.encryptData(mensaje,anna.getValue());
 
-                                    MensajeEncriptado mensajeCliente= new MensajeEncriptado(Base64.getEncoder().encodeToString(bufferComprobacion), Base64.getEncoder().encodeToString(bufferEncriptacion));
-                                    byte [] mensajePadre =Cliente.convertObjectToBytes(mensajeCliente);
+                                    String stringEncriptacion = AES.encrypt(mensaje,contrasena);
+                                    MensajeEncriptadoSimetrico mensajeCliente= new MensajeEncriptadoSimetrico(Base64.getEncoder().encodeToString(bufferComprobacion), stringEncriptacion);
+                                    byte [] mensajePadre = Cliente.convertObjectToBytes(mensajeCliente);
 
 
 
@@ -222,15 +225,39 @@ public class Servidor {
 
                     System.out.println("Se conectacto el siguiente cliente : " + conjuntoIpPuerto);
 
-                    byte[] bufferClaves = publicKey.getEncoded();
+                    byte[] bufferClave = publicKey.getEncoded();
                     int puerto = Integer.parseInt(conjuntoIpPuerto.split(":")[1]);
                     conjuntoIpPuerto=conjuntoIpPuerto.substring(1);
                     InetAddress ip= InetAddress.getByName(conjuntoIpPuerto.split(":")[0]);
 
-                    DatagramPacket envioClaves = new DatagramPacket(bufferClaves, bufferClaves.length,ip, puerto);
-                    socketUDP.send(envioClaves);
+                    DatagramPacket envioClave = new DatagramPacket(bufferClave, bufferClave.length,ip, puerto);
+                    socketUDP.send(envioClave);
+
+
+                    byte[] paqueteva=new byte[1];
+                    DatagramPacket paquetevacio=new DatagramPacket(paqueteva,1);
+                    socketUDP.receive(paquetevacio);
+
+
                     conjuntoIpPuerto="/"+conjuntoIpPuerto;
                     Servidor.clientes.put(conjuntoIpPuerto,publicaCliente);
+
+
+
+                    AES.setKey(".mondongo");
+
+
+                    byte[] clave=new byte[2048];
+                    clave = RSA.encryptData(contrasena,publicaCliente);
+                    byte[] buffer2 = RSA.signData(contrasena,privateKey);
+                    MensajeEncriptado mensajeEncriptado=new MensajeEncriptado(Base64.getEncoder().encodeToString(buffer2),Base64.getEncoder().encodeToString(clave));
+                    byte[] mensajeEncriptadocompleto = Cliente.convertObjectToBytes(mensajeEncriptado);
+                    DatagramPacket envioContrasenaSecreta = new DatagramPacket(mensajeEncriptadocompleto,mensajeEncriptadocompleto.length,ip,puerto);
+                    socketUDP.send(envioContrasenaSecreta);
+
+
+
+
 
                 }
             }
