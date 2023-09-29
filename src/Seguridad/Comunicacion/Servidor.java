@@ -75,25 +75,14 @@ public class Servidor {
 
                     System.out.println("~me llega lo siguiente~");
 
-                    //Convierto lo recibido y mostrar el mensaje
-                    // byte[] a = peticion.getData();
-                    // LO HAGO ARRIBA
-                    // String mensajeConCanal = RSA.decryptData(a,privateKey/*clave privada del srv*/);
-                    //String mensajeConCanal = new String(peticion.getData());
-
 
                     if(mensajeConCanal.contains("SubsTop#")){
                         String topico="";
-//                        String ipMasPuerto="";
                         topico=mensajeConCanal.split("#")[1];
                         topico=topico.split("/")[0];
 
                         System.out.println("SubsTop#" + topico);
-//                        if(!(Servidor.clientes.containsKey(peticion.getAddress()))){
-//                            Servidor.clientes.put(peticion.getAddress(),peticion.getPort());
-//                        }
-//                        ipMasPuerto = peticion.getAddress().toString() + ":" + peticion.getPort();
-//                        ipMasPuerto=ipMasPuerto.substring(1, ipMasPuerto.length());
+
                         if(Servidor.getCanales().containsKey(topico)) {
                             for(Map.Entry<String,PublicKey> cliente: clientes.entrySet()){
                                 if(conjuntoIpPuerto.equals(cliente.getKey())){
@@ -148,11 +137,6 @@ public class Servidor {
                         int puertoCliente = peticion.getPort();
                         InetAddress direccion = peticion.getAddress();
 
-//                        for(Map.Entry<InetAddress, Integer> cliente : Servidor.clientes.entrySet()){
-//                            if(clients.getKey().equals(direccion)){
-//                                Servidor.clientes.put(clients.getKey(),peticion.getPort());
-//                            }
-//                        }
 
 
                         byte[] buffer1 = new byte[2048];
@@ -181,7 +165,6 @@ public class Servidor {
 
                         canal=mensajeConCanal.split("#")[1];
                         canal=canal.split("/")[0];
-                        // TERMINAR ESTO Y TERMINAMOS LA PARTE LOGICA ????
                         System.out.println("~Se reenvió el mensaje a estas IPs: ~");
                         for (Map.Entry<String, HashMap<String, PublicKey>> canals : Servidor.getCanales().entrySet()) {
                             if (canals.getKey().equals(canal)) {
@@ -195,7 +178,6 @@ public class Servidor {
 
 
                                     byte [] bufferComprobacion = RSA.signData(SHA.hashear(mensaje),privateKey);
-//                                  byte [] bufferEncriptacion = mensajeReenviado.getBytes();
                                     byte [] bufferEncriptacion = RSA.encryptData(mensaje,anna.getValue());
 
                                     MensajeEncriptado mensajeCliente= new MensajeEncriptado(Base64.getEncoder().encodeToString(bufferComprobacion), Base64.getEncoder().encodeToString(bufferEncriptacion));

@@ -55,8 +55,6 @@ public class ThreadCLiente implements Runnable {
 
             if(ThreadCLiente.corroboracion(respuesta, MensajeEncriptado.reconvertirBuffer(mensajeEncriptado1.getMensajeHasheadoPrivada()))){
                 System.out.println("El mensaje que llegó está íntegro.");
-            } else {
-                //  System.out.println("Los datos han sido corrompidos en algún momento del envío.");
             }
 
         } catch (IOException e) {
@@ -65,20 +63,12 @@ public class ThreadCLiente implements Runnable {
     }
 
     public static Boolean corroboracion(String mensaje, byte[] mensajeHasheado){
-        Boolean verificador=false;
         String mensajeHashDesencriptado = null;
-
         try {
             mensajeHashDesencriptado = RSA.decryptHashData(mensajeHasheado, Cliente.getPublicaServidor());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
-        if((SHA.hashear(mensaje)).equals(mensajeHashDesencriptado)){
-            verificador=true;
-        }
-
-        return verificador;
+        return (SHA.hashear(mensaje)).equals(mensajeHashDesencriptado);
     }
 }

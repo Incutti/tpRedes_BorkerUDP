@@ -92,6 +92,7 @@ public class Cliente {
 
         while(true) {
             try {
+                // creo un hilo para recibir msgs
                 Thread hiloAck = new Thread(new ThreadCLiente(socketUDP,privateKey));
                 Thread hiloEscucha1 = new Thread(new ThreadCLiente(socketUDP,privateKey));
                 hiloAck.start();
@@ -100,11 +101,6 @@ public class Cliente {
 
 
                 //Creo el socket de UDP
-
-
-                // creo un hilo para recibir msgs
-//                ThreadCliente hiloEscucha = new ThreadCliente(socketUDP);
-//                hiloEscucha.start();
 
                 String mensajeConCanal /*="¡hola!#futbol/"*/;
                 mensajeConCanal = scanner.nextLine();
@@ -128,8 +124,7 @@ public class Cliente {
                         topicoSubscriptos.add(topico);
                     }
 
-                    //Convierto el mensaje a bytes
-//                     buffer = mensajeConCanal.getBytes(StandardCharsets.UTF_8);
+
 
                     //Creo un datagrama
                     DatagramPacket pregunta = new DatagramPacket(bufferEncriptadoCompleto, bufferEncriptadoCompleto.length, direccionServidor, PUERTO_SERVIDOR);
@@ -138,34 +133,7 @@ public class Cliente {
                     System.out.println("Envío el datagrama");
                     socketUDP.send(pregunta);
 
-                    //Preparo la respuesta
-                    //DatagramPacket peticion = new DatagramPacket(buffer1, buffer1.length);
 
-                   //Recibo la respuesta
-                  // socketUDP.receive(peticion);
-                   // System.out.println("Recibo la confimación");
-
-
-                    //Cojo los datos y lo muestro
-                    //String mensaje1 = new String(peticion.getData());
-                    //System.out.println(mensaje1);
-
-
-                    if(!(mensajeConCanal.contains("SubsTop#"))){
-                        for (String topiquito: topicoSubscriptos){
-                            if (topiquito.equals(topico)) {
-
-                               // DatagramPacket mensajeTopico = new DatagramPacket(buffer2, buffer2.length);
-                             //   socketUDP.receive(mensajeTopico);
-                                // muestro Mensaje Recibido
-                             //   String mensaje2 = new String(mensajeTopico.getData());
-                             //   System.out.println(mensaje2);
-                            }
-                        }
-                    }
-
-                    //cierro el socket
-                    // socketUDP.close();
                 } else {
                     System.out.println("Ingrese un mensaje con el formato correcto. El mismo sería: mensaje#tópico/");
                 }
